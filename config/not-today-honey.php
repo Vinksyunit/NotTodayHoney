@@ -2,6 +2,11 @@
 
 use Vinksyunit\NotTodayHoney\Enums\TrapBehavior;
 
+// Extract env values before conversion to enum for config caching compatibility
+$wpBehavior = env('NOT_TODAY_HONEY_WP_BEHAVIOR', '403');
+$pmaBehavior = env('NOT_TODAY_HONEY_PMA_BEHAVIOR', '403');
+$genericBehavior = env('NOT_TODAY_HONEY_GENERIC_BEHAVIOR', '403');
+
 return [
 
     /*
@@ -93,7 +98,7 @@ return [
         'wordpress' => [
             'enabled' => env('NOT_TODAY_HONEY_WP_ENABLED', true),
             'path' => env('NOT_TODAY_HONEY_WP_PATH', '/wp-admin'),
-            'behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_WP_BEHAVIOR', '403')),
+            'behavior' => TrapBehavior::from($wpBehavior),
             'specific' => [
                 'version' => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
             ],
@@ -102,7 +107,7 @@ return [
         'phpmyadmin' => [
             'enabled' => env('NOT_TODAY_HONEY_PMA_ENABLED', true),
             'path' => env('NOT_TODAY_HONEY_PMA_PATH', '/phpmyadmin'),
-            'behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_PMA_BEHAVIOR', '403')),
+            'behavior' => TrapBehavior::from($pmaBehavior),
             'specific' => [
                 'pma_version' => env('NOT_TODAY_HONEY_PMA_VERSION', '5.2.1'),
             ],
@@ -111,7 +116,7 @@ return [
         'generic_admin' => [
             'enabled' => env('NOT_TODAY_HONEY_GENERIC_ENABLED', true),
             'path' => env('NOT_TODAY_HONEY_GENERIC_PATH', '/admin'),
-            'behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_GENERIC_BEHAVIOR', '403')),
+            'behavior' => TrapBehavior::from($genericBehavior),
             'specific' => [
                 'title' => env('NOT_TODAY_HONEY_GENERIC_TITLE', 'Control Panel'),
             ],
