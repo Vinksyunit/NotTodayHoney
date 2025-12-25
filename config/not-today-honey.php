@@ -55,20 +55,23 @@ return [
     'alerts' => [
         'probing' => [
             'threshold' => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
+            'time_window' => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_PROBING_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_PROBING_DURATION', 1440),
+            'duration' => env('NOT_TODAY_HONEY_PROBING_DURATION', 1440), // Minutes
             'notify' => env('NOT_TODAY_HONEY_PROBING_NOTIFY', false),
             'channels' => explode(',', env('NOT_TODAY_HONEY_PROBING_CHANNELS', 'stack')),
         ],
         'intrusion_attempt' => [
             'threshold' => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
+            'time_window' => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_INTRUSION_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 10080),
+            'duration' => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 10080), // Minutes (7 days)
             'notify' => env('NOT_TODAY_HONEY_INTRUSION_NOTIFY', true),
             'channels' => explode(',', env('NOT_TODAY_HONEY_INTRUSION_CHANNELS', 'stack,slack')),
         ],
         'attacking' => [
             'threshold' => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
+            'time_window' => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_ATTACKING_BLOCK', true),
             'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION', null), // Permanent
             'notify' => env('NOT_TODAY_HONEY_ATTACKING_NOTIFY', true),

@@ -27,10 +27,15 @@ class AttackerDetectionService
             [
                 'ip' => $ip,
                 'ip_hash' => $ipHash,
-                'first_attempt_at' => now(),
                 'alert_level' => $level,
             ]
         );
+
+        // Check if the last attempt is outside the time window
+        if ($detection->wasRecentlyCreated === false && $detection->isOutsideTimeWindow($level)) {
+            $detection->resetCounters();
+            $detection->refresh();
+        }
 
         // Increment the counter for this specific level
         $detection->incrementAttemptForLevel($level);

@@ -29,7 +29,6 @@ class AttackerDetection extends Model
         'probing_count',
         'intrusion_attempt_count',
         'attacking_count',
-        'first_attempt_at',
         'blocked_at',
         'blocked_until',
         'alert_level',
@@ -41,7 +40,6 @@ class AttackerDetection extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'first_attempt_at' => 'datetime',
         'blocked_at' => 'datetime',
         'blocked_until' => 'datetime',
         'probing_count' => 'integer',
@@ -72,6 +70,33 @@ class AttackerDetection extends Model
         }
 
         return now()->diffInMinutes($this->blocked_until, false);
+    }
+
+    /**
+     * Check if the last attempt is outside the time window for a level.
+     */
+    public function isOutsideTimeWindow(AlertLevel $level): bool
+    {
+        $config = config('not-today-honey.alerts');
+        $timeWindow = $config[$level->value]['time_window'] ?? 1440; // Default 1 day in minutes
+
+        if (! $this->updated_at) {
+            return false;
+        }
+
+        return now()->greaterThan($this->updated_at->addMinutes($timeWindow));
+    }
+
+    /**
+     * Reset all attempt counters and start a new session.
+     */
+    public function resetCounters(): void
+    {
+        $this->update([
+            'probing_count' => 0,
+            'intrusion_attempt_count' => 0,
+            'attacking_count' => 0,
+        ]);
     }
 
     /**

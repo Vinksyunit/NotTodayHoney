@@ -15,7 +15,6 @@ return new class extends Migration
             $table->unsignedInteger('probing_count')->default(0);
             $table->unsignedInteger('intrusion_attempt_count')->default(0);
             $table->unsignedInteger('attacking_count')->default(0);
-            $table->timestamp('first_attempt_at');
             $table->timestamp('blocked_at')->nullable()->comment('When the block started');
             $table->timestamp('blocked_until')->nullable()->comment('Timestamp until which the IP is blocked');
             $table->enum('alert_level', ['probing', 'intrusion_attempt', 'attacking'])->default('probing');
