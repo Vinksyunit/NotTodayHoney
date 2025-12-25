@@ -26,12 +26,10 @@ class AttackerDetection extends Model
     protected $fillable = [
         'ip',
         'ip_hash',
-        'probing_count',
-        'intrusion_attempt_count',
-        'attacking_count',
+        'attempt_count',
+        'alert_level',
         'blocked_at',
         'blocked_until',
-        'alert_level',
     ];
 
     /**
@@ -42,9 +40,7 @@ class AttackerDetection extends Model
     protected $casts = [
         'blocked_at' => 'datetime',
         'blocked_until' => 'datetime',
-        'probing_count' => 'integer',
-        'intrusion_attempt_count' => 'integer',
-        'attacking_count' => 'integer',
+        'attempt_count' => 'integer',
         'alert_level' => AlertLevel::class,
     ];
 
@@ -73,56 +69,23 @@ class AttackerDetection extends Model
     }
 
     /**
-     * Check if the last attempt is outside the time window for a level.
+     * Scope to get attempts within a time window.
      */
-    public function isOutsideTimeWindow(AlertLevel $level): bool
+    public function scopeWithinTimeWindow($query, int $minutes)
     {
-        $config = config('not-today-honey.alerts');
-        $timeWindow = $config[$level->value]['time_window'] ?? 1440; // Default 1 day in minutes
-
-        if (! $this->updated_at) {
-            return false;
-        }
-
-        return now()->greaterThan($this->updated_at->addMinutes($timeWindow));
+        return $query->where('created_at', '>', now()->subMinutes($minutes));
     }
 
     /**
-     * Reset all attempt counters and start a new session.
+     * Scope to get detection for specific IP and level within time window.
      */
-    public function resetCounters(): void
+    public function scopeForIpAndLevel($query, string $ipHash, AlertLevel $level, int $timeWindowMinutes)
     {
-        $this->update([
-            'probing_count' => 0,
-            'intrusion_attempt_count' => 0,
-            'attacking_count' => 0,
-        ]);
-    }
-
-    /**
-     * Increment the attempt count for a specific alert level.
-     */
-    public function incrementAttemptForLevel(AlertLevel $level): void
-    {
-        $field = match ($level) {
-            AlertLevel::PROBING => 'probing_count',
-            AlertLevel::INTRUSION_ATTEMPT => 'intrusion_attempt_count',
-            AlertLevel::ATTACKING => 'attacking_count',
-        };
-
-        $this->increment($field);
-    }
-
-    /**
-     * Get the attempt count for a specific alert level.
-     */
-    public function getCountForLevel(AlertLevel $level): int
-    {
-        return match ($level) {
-            AlertLevel::PROBING => $this->probing_count,
-            AlertLevel::INTRUSION_ATTEMPT => $this->intrusion_attempt_count,
-            AlertLevel::ATTACKING => $this->attacking_count,
-        };
+        return $query->where('ip_hash', $ipHash)
+            ->where('alert_level', $level)
+            ->where('created_at', '>', now()->subMinutes($timeWindowMinutes))
+            ->latest()
+            ->first();
     }
 
     /**

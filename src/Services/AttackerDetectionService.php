@@ -20,26 +20,25 @@ class AttackerDetectionService
     public function recordAttempt(string $ip, AlertLevel $level): AttackerDetection
     {
         $ipHash = $this->hashIp($ip);
+        $config = config('not-today-honey.alerts');
+        $timeWindow = $config[$level->value]['time_window'] ?? 1440;
 
-        // Find or create the detection record
-        $detection = AttackerDetection::firstOrCreate(
-            ['ip_hash' => $ipHash],
-            [
+        // Try to find an existing detection for this IP, level, and within time window
+        $detection = AttackerDetection::forIpAndLevel($ipHash, $level, $timeWindow);
+
+        if ($detection) {
+            // Found existing detection within time window - increment counter
+            $detection->increment('attempt_count');
+            $detection->refresh();
+        } else {
+            // No detection found or outside time window - create new record
+            $detection = AttackerDetection::create([
                 'ip' => $ip,
                 'ip_hash' => $ipHash,
                 'alert_level' => $level,
-            ]
-        );
-
-        // Check if the last attempt is outside the time window
-        if ($detection->wasRecentlyCreated === false && $detection->isOutsideTimeWindow($level)) {
-            $detection->resetCounters();
-            $detection->refresh();
+                'attempt_count' => 1,
+            ]);
         }
-
-        // Increment the counter for this specific level
-        $detection->incrementAttemptForLevel($level);
-        $detection->refresh();
 
         // Check if threshold is reached and trigger alert
         $this->checkAndTriggerAlert($detection, $level);
@@ -55,10 +54,9 @@ class AttackerDetectionService
         $config = config('not-today-honey.alerts');
         $levelKey = $level->value;
         $threshold = $config[$levelKey]['threshold'];
-        $count = $detection->getCountForLevel($level);
 
         // Trigger alert only when threshold is exactly reached (not on every subsequent attempt)
-        if ($count === $threshold) {
+        if ($detection->attempt_count === $threshold) {
             $this->triggerAlert($detection, $level, $config[$levelKey]['duration']);
         }
     }
@@ -101,13 +99,11 @@ class AttackerDetectionService
     {
         $ipHash = $this->hashIp($ip);
 
-        $detection = AttackerDetection::where('ip_hash', $ipHash)->first();
-
-        if (! $detection) {
-            return false;
-        }
-
-        return $detection->isBlocked();
+        // Check if any detection record for this IP is currently blocked
+        return AttackerDetection::where('ip_hash', $ipHash)
+            ->whereNotNull('blocked_until')
+            ->where('blocked_until', '>', now())
+            ->exists();
     }
 
     /**
