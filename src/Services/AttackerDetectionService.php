@@ -14,6 +14,9 @@ class AttackerDetectionService
     /**
      * Record an attempt from an IP address.
      * This method will create or update the detection record and trigger appropriate events.
+     *
+     * @param  string  $ip  The IP address making the attempt
+     * @param  AlertLevel|null  $forcedLevel  Force a specific alert level (e.g., ATTACKING for leaked passwords)
      */
     public function recordAttempt(string $ip, ?AlertLevel $forcedLevel = null): AttackerDetection
     {
@@ -25,7 +28,7 @@ class AttackerDetectionService
             [
                 'ip' => $ip,
                 'ip_hash' => $ipHash,
-                'attempt_count' => 0,
+                'attempt_count' => 1, // First attempt starts at 1, not 0
                 'first_attempt_at' => now(),
             ]
         );
@@ -40,14 +43,6 @@ class AttackerDetectionService
         $this->checkAndTriggerAlert($detection, $forcedLevel);
 
         return $detection;
-    }
-
-    /**
-     * Record an attempt with a specific level (useful for attacking when leaked password detected).
-     */
-    public function recordAttemptWithLevel(string $ip, AlertLevel $level): AttackerDetection
-    {
-        return $this->recordAttempt($ip, $level);
     }
 
     /**
