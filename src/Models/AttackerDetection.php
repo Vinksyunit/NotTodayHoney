@@ -4,6 +4,7 @@ namespace Vinksyunit\NotTodayHoney\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
 class AttackerDetection extends Model
@@ -126,5 +127,21 @@ class AttackerDetection extends Model
     public function scopeByAlertLevel($query, AlertLevel $level)
     {
         return $query->where('alert_level', $level);
+    }
+
+    /**
+     * Get the trap attempts for this attacker.
+     */
+    public function trapAttempts(): HasMany
+    {
+        return $this->hasMany(TrapAttempt::class);
+    }
+
+    /**
+     * Get the credential attempts for this attacker.
+     */
+    public function credentialAttempts(): HasMany
+    {
+        return $this->hasMany(CredentialAttempt::class);
     }
 }
