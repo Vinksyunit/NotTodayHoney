@@ -36,32 +36,10 @@ class AttackerDetectionService
         $detection->incrementAttemptForLevel($level);
         $detection->refresh();
 
-        // Update alert_level to the highest level seen
-        $this->updateAlertLevel($detection, $level);
-
-        // Check if this level's threshold is reached and trigger event
+        // Check if threshold is reached and trigger alert
         $this->checkAndTriggerAlert($detection, $level);
 
         return $detection;
-    }
-
-    /**
-     * Update the alert level to the highest level encountered.
-     */
-    protected function updateAlertLevel(AttackerDetection $detection, AlertLevel $newLevel): void
-    {
-        $levelPriority = [
-            AlertLevel::PROBING->value => 1,
-            AlertLevel::INTRUSION_ATTEMPT->value => 2,
-            AlertLevel::ATTACKING->value => 3,
-        ];
-
-        $currentPriority = $levelPriority[$detection->alert_level->value];
-        $newPriority = $levelPriority[$newLevel->value];
-
-        if ($newPriority > $currentPriority) {
-            $detection->update(['alert_level' => $newLevel]);
-        }
     }
 
     /**
@@ -76,54 +54,31 @@ class AttackerDetectionService
 
         // Trigger alert only when threshold is exactly reached (not on every subsequent attempt)
         if ($count === $threshold) {
-            $duration = $config[$levelKey]['duration'];
-
-            match ($level) {
-                AlertLevel::PROBING => $this->triggerProbingAlert($detection, $duration),
-                AlertLevel::INTRUSION_ATTEMPT => $this->triggerIntrusionAttemptAlert($detection, $duration),
-                AlertLevel::ATTACKING => $this->triggerAttackingAlert($detection, $duration),
-            };
+            $this->triggerAlert($detection, $level, $config[$levelKey]['duration']);
         }
     }
 
     /**
-     * Trigger a probing alert and block the IP.
+     * Trigger an alert for a specific level and block the IP.
      */
-    protected function triggerProbingAlert(AttackerDetection $detection, ?int $blockDuration): void
+    protected function triggerAlert(AttackerDetection $detection, AlertLevel $level, ?int $blockDuration): void
     {
+        // Block the IP
         if ($blockDuration !== null) {
-            $detection->blockUntil(now()->addMinutes($blockDuration), $detection->alert_level);
-        }
-
-        Event::dispatch(new AttackerProbingEvent($detection));
-    }
-
-    /**
-     * Trigger an intrusion attempt alert and block the IP.
-     */
-    protected function triggerIntrusionAttemptAlert(AttackerDetection $detection, ?int $blockDuration): void
-    {
-        if ($blockDuration !== null) {
-            $detection->blockUntil(now()->addMinutes($blockDuration), $detection->alert_level);
-        }
-
-        Event::dispatch(new AttackerIntrusionAttemptEvent($detection));
-    }
-
-    /**
-     * Trigger an attacking alert and block the IP.
-     */
-    protected function triggerAttackingAlert(AttackerDetection $detection, ?int $blockDuration): void
-    {
-        // Attacking can have null duration (permanent block)
-        if ($blockDuration !== null) {
-            $detection->blockUntil(now()->addMinutes($blockDuration), $detection->alert_level);
+            $detection->blockUntil(now()->addMinutes($blockDuration), $level);
         } else {
-            // Permanent block: set to 100 years in the future
-            $detection->blockUntil(now()->addYears(100), $detection->alert_level);
+            // Permanent block (null duration): set to 100 years in the future
+            $detection->blockUntil(now()->addYears(100), $level);
         }
 
-        Event::dispatch(new AttackerAttackingEvent($detection));
+        // Dispatch the appropriate event
+        $eventClass = match ($level) {
+            AlertLevel::PROBING => AttackerProbingEvent::class,
+            AlertLevel::INTRUSION_ATTEMPT => AttackerIntrusionAttemptEvent::class,
+            AlertLevel::ATTACKING => AttackerAttackingEvent::class,
+        };
+
+        Event::dispatch(new $eventClass($detection));
     }
 
     /**
