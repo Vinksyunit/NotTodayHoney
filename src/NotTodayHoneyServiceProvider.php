@@ -20,6 +20,12 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_not_today_honey_table')
+            ->hasMigration('create_nt_honey_attacker_detections_table')
             ->hasCommand(NotTodayHoneyCommand::class);
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->app->singleton(\Vinksyunit\NotTodayHoney\Services\AttackerDetectionService::class);
     }
 }
