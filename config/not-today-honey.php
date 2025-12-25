@@ -23,7 +23,7 @@ return [
     | 'usernames' : Liste des logins que vous surveillez (ex: admin, root).
     | 'passwords' : Liste de hashs de mots de passe connus pour être dans des leaks.
     |
-    | Si un mot de passe de cette liste est utilisé -> Niveau 3 direct.
+    | Si un mot de passe de cette liste est utilisé -> Niveau "Attacking" direct.
     | Si le username match AUSSI -> Possibilité d'afficher un 'fake_success'.
     |
     */
@@ -47,32 +47,32 @@ return [
     | Alert Levels Configuration
     |--------------------------------------------------------------------------
     |
-    | Level 1: Simple visite du piège.
-    | Level 2: Tentative de login (quelconque).
-    | Level 3: Utilisation d'un mot de passe présent dans la liste 'passwords'.
+    | Probing: Simple visite du piège (reconnaissance/exploration).
+    | Intrusion Attempt: Tentative de login (quelconque).
+    | Attacking: Utilisation d'un mot de passe présent dans la liste 'passwords'.
     |
     */
     'alerts' => [
-        'level_1' => [
-            'threshold' => env('NOT_TODAY_HONEY_L1_THRESHOLD', 3),
-            'mark_as_insecure' => env('NOT_TODAY_HONEY_L1_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_L1_DURATION', 1440),
-            'notify' => env('NOT_TODAY_HONEY_L1_NOTIFY', false),
-            'channels' => explode(',', env('NOT_TODAY_HONEY_L1_CHANNELS', 'stack')),
+        'probing' => [
+            'threshold' => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
+            'mark_as_insecure' => env('NOT_TODAY_HONEY_PROBING_BLOCK', true),
+            'duration' => env('NOT_TODAY_HONEY_PROBING_DURATION', 1440),
+            'notify' => env('NOT_TODAY_HONEY_PROBING_NOTIFY', false),
+            'channels' => explode(',', env('NOT_TODAY_HONEY_PROBING_CHANNELS', 'stack')),
         ],
-        'level_2' => [
-            'threshold' => env('NOT_TODAY_HONEY_L2_THRESHOLD', 1),
-            'mark_as_insecure' => env('NOT_TODAY_HONEY_L2_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_L2_DURATION', 10080),
-            'notify' => env('NOT_TODAY_HONEY_L2_NOTIFY', true),
-            'channels' => explode(',', env('NOT_TODAY_HONEY_L2_CHANNELS', 'stack,slack')),
+        'intrusion_attempt' => [
+            'threshold' => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
+            'mark_as_insecure' => env('NOT_TODAY_HONEY_INTRUSION_BLOCK', true),
+            'duration' => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 10080),
+            'notify' => env('NOT_TODAY_HONEY_INTRUSION_NOTIFY', true),
+            'channels' => explode(',', env('NOT_TODAY_HONEY_INTRUSION_CHANNELS', 'stack,slack')),
         ],
-        'level_3' => [
-            'threshold' => env('NOT_TODAY_HONEY_L3_THRESHOLD', 1),
-            'mark_as_insecure' => env('NOT_TODAY_HONEY_L3_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_L3_DURATION', null), // Permanent
-            'notify' => env('NOT_TODAY_HONEY_L3_NOTIFY', true),
-            'channels' => explode(',', env('NOT_TODAY_HONEY_L3_CHANNELS', 'stack,slack,mail')),
+        'attacking' => [
+            'threshold' => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
+            'mark_as_insecure' => env('NOT_TODAY_HONEY_ATTACKING_BLOCK', true),
+            'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION', null), // Permanent
+            'notify' => env('NOT_TODAY_HONEY_ATTACKING_NOTIFY', true),
+            'channels' => explode(',', env('NOT_TODAY_HONEY_ATTACKING_CHANNELS', 'stack,slack,mail')),
         ],
     ],
 

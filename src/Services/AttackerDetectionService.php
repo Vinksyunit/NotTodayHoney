@@ -3,9 +3,10 @@
 namespace Vinksyunit\NotTodayHoney\Services;
 
 use Illuminate\Support\Facades\Event;
-use Vinksyunit\NotTodayHoney\Events\AttackerLevel1Event;
-use Vinksyunit\NotTodayHoney\Events\AttackerLevel2Event;
-use Vinksyunit\NotTodayHoney\Events\AttackerLevel3Event;
+use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
+use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
+use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
+use Vinksyunit\NotTodayHoney\Events\AttackerProbingEvent;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 
 class AttackerDetectionService
@@ -14,7 +15,7 @@ class AttackerDetectionService
      * Record an attempt from an IP address.
      * This method will create or update the detection record and trigger appropriate events.
      */
-    public function recordAttempt(string $ip, string $level = 'level_1'): AttackerDetection
+    public function recordAttempt(string $ip, ?AlertLevel $forcedLevel = null): AttackerDetection
     {
         $ipHash = $this->hashIp($ip);
 
@@ -36,15 +37,15 @@ class AttackerDetectionService
         }
 
         // Check and trigger appropriate alert based on thresholds or forced level
-        $this->checkAndTriggerAlert($detection, $level);
+        $this->checkAndTriggerAlert($detection, $forcedLevel);
 
         return $detection;
     }
 
     /**
-     * Record an attempt with a specific level (useful for level 3 when leaked password detected).
+     * Record an attempt with a specific level (useful for attacking when leaked password detected).
      */
-    public function recordAttemptWithLevel(string $ip, string $level): AttackerDetection
+    public function recordAttemptWithLevel(string $ip, AlertLevel $level): AttackerDetection
     {
         return $this->recordAttempt($ip, $level);
     }
@@ -52,84 +53,84 @@ class AttackerDetectionService
     /**
      * Check the attempt count and trigger the appropriate alert event.
      */
-    protected function checkAndTriggerAlert(AttackerDetection $detection, ?string $forcedLevel = null): void
+    protected function checkAndTriggerAlert(AttackerDetection $detection, ?AlertLevel $forcedLevel = null): void
     {
         $attemptCount = $detection->attempt_count;
         $config = config('not-today-honey.alerts');
 
         // If a level is forced (e.g., leaked password detected), use it
-        if ($forcedLevel === 'level_3') {
-            $this->triggerLevel3Alert($detection, $config['level_3']['duration']);
+        if ($forcedLevel === AlertLevel::ATTACKING) {
+            $this->triggerAttackingAlert($detection, $config['attacking']['duration']);
 
             return;
         }
 
-        if ($forcedLevel === 'level_2') {
-            $this->triggerLevel2Alert($detection, $config['level_2']['duration']);
+        if ($forcedLevel === AlertLevel::INTRUSION_ATTEMPT) {
+            $this->triggerIntrusionAttemptAlert($detection, $config['intrusion_attempt']['duration']);
 
             return;
         }
 
-        // Check level 3 threshold first
-        if ($attemptCount >= $config['level_3']['threshold']) {
-            $this->triggerLevel3Alert($detection, $config['level_3']['duration']);
+        // Check attacking threshold first
+        if ($attemptCount >= $config['attacking']['threshold']) {
+            $this->triggerAttackingAlert($detection, $config['attacking']['duration']);
 
             return;
         }
 
-        // Check level 2 threshold
-        if ($attemptCount >= $config['level_2']['threshold']) {
-            $this->triggerLevel2Alert($detection, $config['level_2']['duration']);
+        // Check intrusion_attempt threshold
+        if ($attemptCount >= $config['intrusion_attempt']['threshold']) {
+            $this->triggerIntrusionAttemptAlert($detection, $config['intrusion_attempt']['duration']);
 
             return;
         }
 
-        // Check level 1 threshold
-        if ($attemptCount >= $config['level_1']['threshold']) {
-            $this->triggerLevel1Alert($detection, $config['level_1']['duration']);
+        // Check probing threshold
+        if ($attemptCount >= $config['probing']['threshold']) {
+            $this->triggerProbingAlert($detection, $config['probing']['duration']);
         }
     }
 
     /**
-     * Trigger a level 1 alert.
+     * Trigger a probing alert.
      */
-    protected function triggerLevel1Alert(AttackerDetection $detection, ?int $blockDuration): void
+    protected function triggerProbingAlert(AttackerDetection $detection, ?int $blockDuration): void
     {
-        if ($detection->alert_level !== 'level_1') {
+        if ($detection->alert_level !== AlertLevel::PROBING) {
             if ($blockDuration !== null) {
-                $detection->block($blockDuration, 'level_1');
+                $detection->blockUntil(now()->addMinutes($blockDuration), AlertLevel::PROBING);
             }
-            Event::dispatch(new AttackerLevel1Event($detection));
+            Event::dispatch(new AttackerProbingEvent($detection));
         }
     }
 
     /**
-     * Trigger a level 2 alert.
+     * Trigger an intrusion attempt alert.
      */
-    protected function triggerLevel2Alert(AttackerDetection $detection, ?int $blockDuration): void
+    protected function triggerIntrusionAttemptAlert(AttackerDetection $detection, ?int $blockDuration): void
     {
-        if ($detection->alert_level !== 'level_2' && $detection->alert_level !== 'level_3') {
+        if ($detection->alert_level !== AlertLevel::INTRUSION_ATTEMPT && $detection->alert_level !== AlertLevel::ATTACKING) {
             if ($blockDuration !== null) {
-                $detection->block($blockDuration, 'level_2');
+                $detection->blockUntil(now()->addMinutes($blockDuration), AlertLevel::INTRUSION_ATTEMPT);
             }
-            Event::dispatch(new AttackerLevel2Event($detection));
+            Event::dispatch(new AttackerIntrusionAttemptEvent($detection));
         }
     }
 
     /**
-     * Trigger a level 3 alert.
+     * Trigger an attacking alert.
      */
-    protected function triggerLevel3Alert(AttackerDetection $detection, ?int $blockDuration): void
+    protected function triggerAttackingAlert(AttackerDetection $detection, ?int $blockDuration): void
     {
-        if ($detection->alert_level !== 'level_3') {
-            // Level 3 can have null duration (permanent block)
+        if ($detection->alert_level !== AlertLevel::ATTACKING) {
+            // Attacking can have null duration (permanent block)
             if ($blockDuration !== null) {
-                $detection->block($blockDuration, 'level_3');
+                $detection->blockUntil(now()->addMinutes($blockDuration), AlertLevel::ATTACKING);
             } else {
-                // Permanent block: set a very high duration (100 years)
-                $detection->block(52560000, 'level_3');
+                // Permanent block: set to 100 years in the future
+                $detection->blockUntil(now()->addYears(100), AlertLevel::ATTACKING);
             }
-            Event::dispatch(new AttackerLevel3Event($detection));
+            Event::dispatch(new AttackerAttackingEvent($detection));
         }
     }
 
@@ -178,7 +179,7 @@ class AttackerDetectionService
     /**
      * Get detections by alert level.
      */
-    public function getDetectionsByLevel(string $level): \Illuminate\Database\Eloquent\Collection
+    public function getDetectionsByLevel(AlertLevel $level): \Illuminate\Database\Eloquent\Collection
     {
         return AttackerDetection::byAlertLevel($level)->get();
     }

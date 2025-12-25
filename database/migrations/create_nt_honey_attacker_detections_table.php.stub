@@ -14,14 +14,14 @@ return new class extends Migration
             $table->string('ip_hash', 64)->index(); // SHA256 hash of IP
             $table->unsignedInteger('attempt_count')->default(1);
             $table->timestamp('first_attempt_at');
-            $table->timestamp('blocked_at')->nullable();
-            $table->unsignedInteger('block_duration')->nullable()->comment('Duration in minutes');
-            $table->enum('alert_level', ['level_1', 'level_2', 'level_3'])->default('level_1');
+            $table->timestamp('blocked_at')->nullable()->comment('When the block started');
+            $table->timestamp('blocked_until')->nullable()->comment('Timestamp until which the IP is blocked');
+            $table->enum('alert_level', ['probing', 'intrusion_attempt', 'attacking'])->default('probing');
             $table->timestamps();
 
             // Indexes for performance
             $table->index('ip');
-            $table->index('blocked_at');
+            $table->index('blocked_until');
             $table->index('alert_level');
         });
     }

@@ -4,16 +4,17 @@ namespace Vinksyunit\NotTodayHoney\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 
-class AttackerLevel1Event
+class AttackerAttackingEvent
 {
     use Dispatchable, SerializesModels;
 
     /**
      * The alert level for this event.
      */
-    public const ALERT_LEVEL = 'level_1';
+    public const ALERT_LEVEL = AlertLevel::ATTACKING;
 
     /**
      * The attacker detection model.
@@ -47,7 +48,7 @@ class AttackerLevel1Event
     /**
      * Get the alert level.
      */
-    public function getAlertLevel(): string
+    public function getAlertLevel(): AlertLevel
     {
         return self::ALERT_LEVEL;
     }

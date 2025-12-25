@@ -4,6 +4,7 @@ namespace Vinksyunit\NotTodayHoney\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
 class AttackerDetection extends Model
 {
@@ -27,7 +28,7 @@ class AttackerDetection extends Model
         'attempt_count',
         'first_attempt_at',
         'blocked_at',
-        'block_duration',
+        'blocked_until',
         'alert_level',
     ];
 
@@ -39,8 +40,9 @@ class AttackerDetection extends Model
     protected $casts = [
         'first_attempt_at' => 'datetime',
         'blocked_at' => 'datetime',
+        'blocked_until' => 'datetime',
         'attempt_count' => 'integer',
-        'block_duration' => 'integer',
+        'alert_level' => AlertLevel::class,
     ];
 
     /**
@@ -48,13 +50,11 @@ class AttackerDetection extends Model
      */
     public function isBlocked(): bool
     {
-        if (! $this->blocked_at || ! $this->block_duration) {
+        if (! $this->blocked_until) {
             return false;
         }
 
-        $blockExpiry = $this->blocked_at->addMinutes($this->block_duration);
-
-        return now()->lessThan($blockExpiry);
+        return now()->lessThan($this->blocked_until);
     }
 
     /**
@@ -66,9 +66,7 @@ class AttackerDetection extends Model
             return null;
         }
 
-        $blockExpiry = $this->blocked_at->addMinutes($this->block_duration);
-
-        return now()->diffInMinutes($blockExpiry, false);
+        return now()->diffInMinutes($this->blocked_until, false);
     }
 
     /**
@@ -80,13 +78,13 @@ class AttackerDetection extends Model
     }
 
     /**
-     * Block the attacker for a specified duration.
+     * Block the attacker until a specific timestamp.
      */
-    public function block(int $durationInMinutes, string $alertLevel): void
+    public function blockUntil(\DateTimeInterface $blockedUntil, AlertLevel $alertLevel): void
     {
         $this->update([
             'blocked_at' => now(),
-            'block_duration' => $durationInMinutes,
+            'blocked_until' => $blockedUntil,
             'alert_level' => $alertLevel,
         ]);
     }
@@ -96,15 +94,14 @@ class AttackerDetection extends Model
      */
     public function scopeBlocked($query)
     {
-        return $query->whereNotNull('blocked_at')
-            ->whereNotNull('block_duration')
-            ->whereRaw('DATE_ADD(blocked_at, INTERVAL block_duration MINUTE) > NOW()');
+        return $query->whereNotNull('blocked_until')
+            ->where('blocked_until', '>', now());
     }
 
     /**
      * Scope to get attackers by alert level.
      */
-    public function scopeByAlertLevel($query, string $level)
+    public function scopeByAlertLevel($query, AlertLevel $level)
     {
         return $query->where('alert_level', $level);
     }
