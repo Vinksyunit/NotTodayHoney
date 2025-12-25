@@ -9,8 +9,8 @@ return [
     | IPs Whitelist
     |--------------------------------------------------------------------------
     |
-    | Les IPs qui ne seront jamais bloquées. Elles déclenchent les événements
-    | avec l'attribut 'is_test' à true.
+    | IPs that will never be blocked. They trigger events with the
+    | 'is_test' attribute set to true.
     |
     */
     'whitelist' => explode(',', env('NOT_TODAY_HONEY_WHITELIST', '127.0.0.1')),
@@ -20,11 +20,11 @@ return [
     | Leaked Credentials Database
     |--------------------------------------------------------------------------
     |
-    | 'usernames' : Liste des logins que vous surveillez (ex: admin, root).
-    | 'passwords' : Liste de hashs de mots de passe connus pour être dans des leaks.
+    | 'usernames': List of logins you are monitoring (e.g., admin, root).
+    | 'passwords': List of password hashes known to be in data leaks.
     |
-    | Si un mot de passe de cette liste est utilisé -> Niveau "Attacking" direct.
-    | Si le username match AUSSI -> Possibilité d'afficher un 'fake_success'.
+    | If a password from this list is used -> Direct "Attacking" level.
+    | If the username ALSO matches -> Possibility to display a 'fake_success'.
     |
     */
     'credentials' => [
@@ -47,9 +47,9 @@ return [
     | Alert Levels Configuration
     |--------------------------------------------------------------------------
     |
-    | Probing: Simple visite du piège (reconnaissance/exploration).
-    | Intrusion Attempt: Tentative de login (quelconque).
-    | Attacking: Utilisation d'un mot de passe présent dans la liste 'passwords'.
+    | Probing: Simple trap visit (reconnaissance/exploration).
+    | Intrusion Attempt: Any login attempt.
+    | Attacking: Use of a password present in the 'passwords' list.
     |
     */
     'alerts' => [
@@ -84,11 +84,11 @@ return [
     | Honeypot Traps
     |--------------------------------------------------------------------------
     |
-    | Comportements disponibles :
-    | '403'             -> Accès interdit.
-    | '500'             -> Simule une erreur serveur.
-    | 'infinite_loading'-> Fait ramer la requête jusqu'au timeout.
-    | 'fake_success'    -> Simule un dashboard vide (si le username match).
+    | Available behaviors:
+    | '403'             -> Access forbidden.
+    | '500'             -> Simulates a server error.
+    | 'infinite_loading'-> Stalls the request until timeout.
+    | 'fake_success'    -> Simulates an empty dashboard (if username matches).
     |
     */
     'traps' => [
