@@ -25,7 +25,9 @@ class AttackerDetection extends Model
     protected $fillable = [
         'ip',
         'ip_hash',
-        'attempt_count',
+        'probing_count',
+        'intrusion_attempt_count',
+        'attacking_count',
         'first_attempt_at',
         'blocked_at',
         'blocked_until',
@@ -41,7 +43,9 @@ class AttackerDetection extends Model
         'first_attempt_at' => 'datetime',
         'blocked_at' => 'datetime',
         'blocked_until' => 'datetime',
-        'attempt_count' => 'integer',
+        'probing_count' => 'integer',
+        'intrusion_attempt_count' => 'integer',
+        'attacking_count' => 'integer',
         'alert_level' => AlertLevel::class,
     ];
 
@@ -70,11 +74,29 @@ class AttackerDetection extends Model
     }
 
     /**
-     * Increment the attempt count.
+     * Increment the attempt count for a specific alert level.
      */
-    public function incrementAttempts(): void
+    public function incrementAttemptForLevel(AlertLevel $level): void
     {
-        $this->increment('attempt_count');
+        $field = match ($level) {
+            AlertLevel::PROBING => 'probing_count',
+            AlertLevel::INTRUSION_ATTEMPT => 'intrusion_attempt_count',
+            AlertLevel::ATTACKING => 'attacking_count',
+        };
+
+        $this->increment($field);
+    }
+
+    /**
+     * Get the attempt count for a specific alert level.
+     */
+    public function getCountForLevel(AlertLevel $level): int
+    {
+        return match ($level) {
+            AlertLevel::PROBING => $this->probing_count,
+            AlertLevel::INTRUSION_ATTEMPT => $this->intrusion_attempt_count,
+            AlertLevel::ATTACKING => $this->attacking_count,
+        };
     }
 
     /**
