@@ -10,7 +10,7 @@ use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
 class AttackerIntrusionAttemptEvent implements AttackerAlertEvent
 {
-    use Dispatchable, SerializesModels, HasAttackerAlertMethods;
+    use Dispatchable, HasAttackerAlertMethods, SerializesModels;
 
     /**
      * The alert level for this event.
