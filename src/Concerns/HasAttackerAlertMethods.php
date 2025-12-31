@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vinksyunit\NotTodayHoney\Concerns;
 
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;

@@ -73,7 +73,7 @@ return [
             'threshold' => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
             'time_window' => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_ATTACKING_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION', null), // Permanent
+            'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION'), // Permanent
             'notify' => env('NOT_TODAY_HONEY_ATTACKING_NOTIFY', true),
             'channels' => explode(',', env('NOT_TODAY_HONEY_ATTACKING_CHANNELS', 'stack,slack,mail')),
         ],

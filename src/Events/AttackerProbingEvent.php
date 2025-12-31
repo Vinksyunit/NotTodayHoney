@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vinksyunit\NotTodayHoney\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
@@ -10,7 +12,9 @@ use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
 class AttackerProbingEvent implements AttackerAlertEvent
 {
-    use Dispatchable, HasAttackerAlertMethods, SerializesModels;
+    use Dispatchable;
+    use HasAttackerAlertMethods;
+    use SerializesModels;
 
     /**
      * The alert level for this event.
