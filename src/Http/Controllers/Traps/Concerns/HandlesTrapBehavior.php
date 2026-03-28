@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Enums\TrapBehavior;
+use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 use Vinksyunit\NotTodayHoney\Models\TrapAttempt;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
@@ -62,7 +63,7 @@ trait HandlesTrapBehavior
     /**
      * Record the detection via service.
      */
-    protected function recordDetection(Request $request): \Vinksyunit\NotTodayHoney\Models\AttackerDetection
+    protected function recordDetection(Request $request): AttackerDetection
     {
         return app(AttackerDetectionService::class)
             ->recordAttempt($request->ip(), $this->getAlertLevel());

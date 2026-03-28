@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vinksyunit\NotTodayHoney\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
@@ -121,7 +122,7 @@ class AttackerDetectionService
     /**
      * Get all currently blocked IPs.
      */
-    public function getBlockedIps(): \Illuminate\Database\Eloquent\Collection
+    public function getBlockedIps(): Collection
     {
         return AttackerDetection::blocked()->get();
     }
@@ -129,7 +130,7 @@ class AttackerDetectionService
     /**
      * Get detections by alert level.
      */
-    public function getDetectionsByLevel(AlertLevel $level): \Illuminate\Database\Eloquent\Collection
+    public function getDetectionsByLevel(AlertLevel $level): Collection
     {
         return AttackerDetection::byAlertLevel($level)->get();
     }

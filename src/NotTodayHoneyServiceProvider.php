@@ -7,6 +7,7 @@ namespace Vinksyunit\NotTodayHoney;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Vinksyunit\NotTodayHoney\Commands\NotTodayHoneyCommand;
+use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
 class NotTodayHoneyServiceProvider extends PackageServiceProvider
 {
@@ -31,7 +32,7 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        $this->app->singleton(\Vinksyunit\NotTodayHoney\Services\AttackerDetectionService::class);
-        $this->app->singleton(\Vinksyunit\NotTodayHoney\NotTodayHoney::class);
+        $this->app->singleton(AttackerDetectionService::class);
+        $this->app->singleton(NotTodayHoney::class);
     }
 }
