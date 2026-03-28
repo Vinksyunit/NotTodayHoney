@@ -32,5 +32,6 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->singleton(\Vinksyunit\NotTodayHoney\Services\AttackerDetectionService::class);
+        $this->app->singleton(\Vinksyunit\NotTodayHoney\NotTodayHoney::class);
     }
 }
