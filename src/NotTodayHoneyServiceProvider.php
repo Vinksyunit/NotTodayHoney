@@ -9,7 +9,6 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Vinksyunit\NotTodayHoney\Commands\HoneyStatusCommand;
 use Vinksyunit\NotTodayHoney\Commands\HoneyUnblockCommand;
 use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
-use Vinksyunit\NotTodayHoney\NotTodayHoney;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
 class NotTodayHoneyServiceProvider extends PackageServiceProvider

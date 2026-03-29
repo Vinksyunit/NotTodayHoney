@@ -9,6 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
+/**
+ * @property int $id
+ * @property string $ip
+ * @property string $ip_hash
+ * @property int $attempt_count
+ * @property AlertLevel $alert_level
+ * @property \Illuminate\Support\Carbon|null $blocked_at
+ * @property \Illuminate\Support\Carbon|null $blocked_until
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class AttackerDetection extends Model
 {
     use HasFactory;
@@ -23,7 +34,7 @@ class AttackerDetection extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'ip',

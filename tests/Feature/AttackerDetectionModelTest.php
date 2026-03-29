@@ -7,11 +7,11 @@ use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 
 it('reports as blocked when blocked_until is in the future', function () {
     $detection = AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 1,
-        'blocked_at'    => now(),
+        'blocked_at' => now(),
         'blocked_until' => now()->addHour(),
     ]);
 
@@ -21,9 +21,9 @@ it('reports as blocked when blocked_until is in the future', function () {
 
 it('reports as not blocked when blocked_until is in the past', function () {
     $detection = AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 1,
         'blocked_until' => now()->subHour(),
     ]);
@@ -34,9 +34,9 @@ it('reports as not blocked when blocked_until is in the past', function () {
 
 it('reports as not blocked when blocked_until is null', function () {
     $detection = AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 1,
     ]);
 
@@ -59,9 +59,9 @@ it('scope blocked returns only blocked detections', function () {
 
 it('scope forIpAndLevel returns detection within time window', function () {
     $detection = AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 1,
     ]);
 
@@ -72,9 +72,9 @@ it('scope forIpAndLevel returns detection within time window', function () {
 
 it('scope forIpAndLevel returns null for different alert level', function () {
     AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 1,
     ]);
 

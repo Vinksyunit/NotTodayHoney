@@ -20,11 +20,11 @@ it('allows non-blocked IPs through', function () {
 
 it('blocks a blocked IP with 403', function () {
     AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 3,
-        'blocked_at'    => now(),
+        'blocked_at' => now(),
         'blocked_until' => now()->addHour(),
     ]);
 
@@ -35,11 +35,11 @@ it('blocks a blocked IP with 403', function () {
 
 it('allows a previously blocked IP whose block has expired', function () {
     AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::PROBING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::PROBING,
         'attempt_count' => 3,
-        'blocked_at'    => now()->subHours(2),
+        'blocked_at' => now()->subHours(2),
         'blocked_until' => now()->subHour(),
     ]);
 
@@ -51,11 +51,11 @@ it('allows a previously blocked IP whose block has expired', function () {
 it('never blocks whitelisted IPs', function () {
     config()->set('not-today-honey.whitelist', ['1.2.3.4']);
     AttackerDetection::create([
-        'ip'            => '1.2.3.4',
-        'ip_hash'       => hash('sha256', '1.2.3.4'),
-        'alert_level'   => AlertLevel::ATTACKING,
+        'ip' => '1.2.3.4',
+        'ip_hash' => hash('sha256', '1.2.3.4'),
+        'alert_level' => AlertLevel::ATTACKING,
         'attempt_count' => 1,
-        'blocked_at'    => now(),
+        'blocked_at' => now(),
         'blocked_until' => now()->addYears(100),
     ]);
 

@@ -10,6 +10,7 @@ use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 class HoneyStatusCommand extends Command
 {
     public $signature = 'honey:status';
+
     public $description = 'Display currently blocked IPs and detection statistics';
 
     public function handle(): int
@@ -24,11 +25,11 @@ class HoneyStatusCommand extends Command
 
         $this->table(
             ['IP', 'Alert Level', 'Attempts', 'Blocked Until'],
-            $blocked->map(fn ($d) => [
+            $blocked->map(fn (AttackerDetection $d) => [
                 $d->ip,
                 $d->alert_level->value,
                 $d->attempt_count,
-                $d->blocked_until->format('Y-m-d H:i:s'),
+                $d->blocked_until?->format('Y-m-d H:i:s') ?? 'N/A',
             ])->toArray()
         );
 

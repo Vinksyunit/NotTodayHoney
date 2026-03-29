@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Event;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
 use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
 use Vinksyunit\NotTodayHoney\Events\AttackerProbingEvent;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
-use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {
     $this->service = app(AttackerDetectionService::class);

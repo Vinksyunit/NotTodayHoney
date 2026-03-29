@@ -10,6 +10,7 @@ use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 class HoneyUnblockCommand extends Command
 {
     public $signature = 'honey:unblock {ip : The IP address to unblock}';
+
     public $description = 'Remove all detection records for a given IP address';
 
     public function __construct(private readonly AttackerDetectionService $service)
