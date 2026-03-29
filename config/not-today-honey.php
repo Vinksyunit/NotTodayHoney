@@ -37,7 +37,7 @@ return [
             ],
             [
                 'id' => 'common_bot_pass',
-                'hash' => env('NOT_TODAY_HONEY_HASH_2', '$2y$10$V8y.f6vB6Y...'),
+                'hash' => env('NOT_TODAY_HONEY_HASH_2', '$2y$12$MpIJDXlMSbIaTHh9DcXIsOA.7RdxNkd1cFXwv1O0zy2UoO0DzA.Uq'), // 123456
             ],
         ],
     ],

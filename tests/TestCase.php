@@ -29,6 +29,13 @@ class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
+        config()->set('not-today-honey.whitelist', []);
+        config()->set('not-today-honey.traps.wordpress.enabled', true);
+        config()->set('not-today-honey.traps.phpmyadmin.enabled', true);
+        config()->set('not-today-honey.traps.generic_admin.enabled', true);
+        config()->set('not-today-honey.traps.wordpress.behavior', \Vinksyunit\NotTodayHoney\Enums\TrapBehavior::FORBIDDEN);
+        config()->set('not-today-honey.traps.phpmyadmin.behavior', \Vinksyunit\NotTodayHoney\Enums\TrapBehavior::FORBIDDEN);
+        config()->set('not-today-honey.traps.generic_admin.behavior', \Vinksyunit\NotTodayHoney\Enums\TrapBehavior::FORBIDDEN);
     }
 
     protected function defineDatabaseMigrations(): void

@@ -24,8 +24,12 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
             ->hasMigration('create_nt_honey_attacker_detections_table')
             ->hasMigration('create_nt_honey_trap_attempts_table')
             ->hasMigration('create_nt_honey_credential_attempts_table')
-            ->hasRoutes('traps')
             ->hasCommand(NotTodayHoneyCommand::class);
+    }
+
+    public function packageBooted(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/traps.php');
     }
 
     public function packageRegistered(): void
