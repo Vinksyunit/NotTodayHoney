@@ -6,7 +6,7 @@ A trap is a realistic-looking login page served at a URL that legitimate users w
 
 Simulates the WordPress `wp-login.php` login page, including the spoofed version number in the HTML.
 
-**Default URL:** `/wp-login.php`
+**Route:** `GET /wp-login.php`, `POST /wp-login.php`
 
 **Environment variables:**
 
