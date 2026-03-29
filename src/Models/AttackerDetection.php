@@ -67,7 +67,7 @@ class AttackerDetection extends Model
             return null;
         }
 
-        return now()->diffInMinutes($this->blocked_until, false);
+        return (int) now()->diffInMinutes($this->blocked_until, false);
     }
 
     /**
@@ -86,7 +86,16 @@ class AttackerDetection extends Model
         return $query->where('ip_hash', $ipHash)
             ->where('alert_level', $level)
             ->where('created_at', '>', now()->subMinutes($timeWindowMinutes))
-            ->latest()
+            ->latest();
+    }
+
+    /**
+     * Find detection for specific IP and level within time window.
+     */
+    public static function forIpAndLevel(string $ipHash, AlertLevel $level, int $timeWindowMinutes): ?self
+    {
+        return static::query()
+            ->forIpAndLevel($ipHash, $level, $timeWindowMinutes)
             ->first();
     }
 
