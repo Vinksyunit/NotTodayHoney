@@ -44,7 +44,9 @@ php artisan migrate
 
 <p align="center">
   <a href="https://starkado.com/" target="_blank" rel="noopener">
-    <img src="https://starkado.com/images/landing/logo-starkado.svg" alt="Starkado" width="200">
+    <span style="display:inline-block;background:#ffffff;border-radius:8px;padding:12px 20px">
+      <img src="https://starkado.com/images/landing/logo-starkado.svg" alt="Starkado" width="160">
+    </span>
   </a>
 </p>
 
