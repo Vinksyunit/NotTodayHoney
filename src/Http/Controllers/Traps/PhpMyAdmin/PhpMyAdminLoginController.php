@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\Concerns\HandlesTrapBehavior;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\Concerns\HasHttpFingerprint;
 
 class PhpMyAdminLoginController
 {
     use HandlesTrapBehavior;
+    use HasHttpFingerprint;
 
     protected function getTrapName(): string
     {
@@ -20,7 +22,7 @@ class PhpMyAdminLoginController
 
     public function __invoke(Request $request): SymfonyResponse
     {
-        return $this->executeTrap($request);
+        return $this->applyFingerprint($request, $this->executeTrap($request));
     }
 
     protected function respondLoginPage(Request $request): Response
