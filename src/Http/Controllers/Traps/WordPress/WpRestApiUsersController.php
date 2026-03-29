@@ -51,7 +51,7 @@ class WpRestApiUsersController
                 ],
                 '_links' => [
                     'self' => [['href' => sprintf('%s/wp-json/wp/v2/users/%d', $host, $id)]],
-                    'collection' => [['href' => $host . '/wp-json/wp/v2/users']],
+                    'collection' => [['href' => $host.'/wp-json/wp/v2/users']],
                 ],
             ];
         }

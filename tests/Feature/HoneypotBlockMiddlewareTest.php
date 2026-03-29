@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Support\Facades\Route;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
@@ -9,7 +10,7 @@ use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 
 beforeEach(function (): void {
     Route::middleware(HoneypotBlockMiddleware::class)
-        ->get('/protected', fn (): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response => response('ok', 200));
+        ->get('/protected', fn (): ResponseFactory|\Illuminate\Http\Response => response('ok', 200));
 });
 
 it('allows non-blocked IPs through', function (): void {
