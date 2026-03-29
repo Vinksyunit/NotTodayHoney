@@ -147,6 +147,8 @@ it('logs at warning level when intrusion_attempt threshold is reached', function
         ->once()
         ->withArgs(fn ($level, $message, $context) =>
             $level === 'warning' &&
+            $message === '[NotTodayHoney] Attacker detected' &&
+            $context['ip'] === '10.0.0.2' &&
             $context['alert_level'] === 'intrusion_attempt'
         );
 });
@@ -161,6 +163,8 @@ it('logs at critical level when attacking threshold is reached', function () {
         ->once()
         ->withArgs(fn ($level, $message, $context) =>
             $level === 'critical' &&
+            $message === '[NotTodayHoney] Attacker detected' &&
+            $context['ip'] === '10.0.0.3' &&
             $context['alert_level'] === 'attacking'
         );
 });
