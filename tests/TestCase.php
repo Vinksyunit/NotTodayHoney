@@ -29,11 +29,12 @@ class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
+    }
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/../database/migrations') as $migration) {
+    protected function defineDatabaseMigrations(): void
+    {
+        foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__.'/../database/migrations') as $migration) {
             (include $migration->getRealPath())->up();
-         }
-         */
+        }
     }
 }

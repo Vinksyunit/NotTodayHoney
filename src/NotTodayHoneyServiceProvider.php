@@ -21,7 +21,6 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
             ->name('not-today-honey')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_not_today_honey_table')
             ->hasMigration('create_nt_honey_attacker_detections_table')
             ->hasMigration('create_nt_honey_trap_attempts_table')
             ->hasMigration('create_nt_honey_credential_attempts_table')
