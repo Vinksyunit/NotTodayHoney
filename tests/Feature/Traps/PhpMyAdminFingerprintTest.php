@@ -5,7 +5,8 @@ declare(strict_types=1);
 it('GET /phpmyadmin/ sets phpMyAdmin session cookie', function (): void {
     $response = $this->get('/phpmyadmin/');
 
-    $response->assertCookie('phpMyAdmin');
+    // assertPlainCookie: cookie is intentionally unencrypted (fingerprinting value)
+    $response->assertPlainCookie('phpMyAdmin');
 });
 
 it('GET /phpmyadmin/ sets pma_lang cookie with configured language', function (): void {
