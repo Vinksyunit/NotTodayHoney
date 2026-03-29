@@ -9,6 +9,7 @@ use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginCo
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginSubmitController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginSubmitController;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiIndexController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,12 @@ if (config('not-today-honey.traps.wordpress.enabled', false)) {
     Route::get($wpPath.'/', fn () => redirect("/{$wpPath}/wp-login.php"));
     Route::get($wpPath.'/wp-login.php', WordPressLoginController::class);
     Route::post($wpPath.'/wp-login.php', WordPressLoginSubmitController::class);
+
+    $fingerprintEnabled = config('not-today-honey.traps.wordpress.specific.fingerprint.enabled', false);
+
+    if ($fingerprintEnabled && config('not-today-honey.traps.wordpress.specific.fingerprint.rest_api', false)) {
+        Route::get('wp-json/', WpRestApiIndexController::class);
+    }
 }
 
 /*
