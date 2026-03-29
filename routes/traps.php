@@ -16,8 +16,12 @@ use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginSubm
 |--------------------------------------------------------------------------
 */
 if (config('not-today-honey.traps.wordpress.enabled', false)) {
-    Route::get('wp-login.php', WordPressLoginController::class);
-    Route::post('wp-login.php', WordPressLoginSubmitController::class);
+    $wpPath = ltrim(config('not-today-honey.traps.wordpress.path', '/wp-admin'), '/');
+
+    Route::get($wpPath, fn () => redirect("/{$wpPath}/wp-login.php"));
+    Route::get($wpPath.'/', fn () => redirect("/{$wpPath}/wp-login.php"));
+    Route::get($wpPath.'/wp-login.php', WordPressLoginController::class);
+    Route::post($wpPath.'/wp-login.php', WordPressLoginSubmitController::class);
 }
 
 /*
@@ -30,7 +34,7 @@ if (config('not-today-honey.traps.phpmyadmin.enabled', false)) {
 
     Route::prefix($pmaPath)->group(function (): void {
         Route::get('/', PhpMyAdminLoginController::class);
-        Route::post('index.php', PhpMyAdminLoginSubmitController::class);
+        Route::post('/', PhpMyAdminLoginSubmitController::class);
     });
 }
 

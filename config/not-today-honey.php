@@ -99,6 +99,8 @@ return [
             'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_WP_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
             'specific' => [
                 'version' => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
+                'site_name' => env('NOT_TODAY_HONEY_WP_SITE_NAME', 'WordPress'),
+                'logo_url' => env('NOT_TODAY_HONEY_WP_LOGO_URL', null),
             ],
         ],
 
@@ -108,6 +110,7 @@ return [
             'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_PMA_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
             'specific' => [
                 'pma_version' => env('NOT_TODAY_HONEY_PMA_VERSION', '5.2.1'),
+                'server' => env('NOT_TODAY_HONEY_PMA_SERVER', 'localhost'),
             ],
         ],
 
