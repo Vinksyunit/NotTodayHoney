@@ -6,6 +6,7 @@ namespace Vinksyunit\NotTodayHoney\Services;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
 use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
@@ -87,11 +88,23 @@ class AttackerDetectionService
             $detection->blockUntil(now()->addYears(100), $level);
         }
 
+        // Log the detection to the application's default log channel
+        $logLevel = config("not-today-honey.alerts.{$level->value}.log_level", 'warning');
+        $trapName = $detection->trapAttempts()->latest()->value('trap_name');
+
+        Log::log($logLevel, '[NotTodayHoney] Attacker detected', [
+            'ip'            => $detection->ip,
+            'alert_level'   => $level->value,
+            'attempt_count' => $detection->attempt_count,
+            'blocked_until' => $detection->blocked_until?->toIso8601String(),
+            'trap_name'     => $trapName,
+        ]);
+
         // Dispatch the appropriate event
         $eventClass = match ($level) {
-            AlertLevel::PROBING => AttackerProbingEvent::class,
+            AlertLevel::PROBING           => AttackerProbingEvent::class,
             AlertLevel::INTRUSION_ATTEMPT => AttackerIntrusionAttemptEvent::class,
-            AlertLevel::ATTACKING => AttackerAttackingEvent::class,
+            AlertLevel::ATTACKING         => AttackerAttackingEvent::class,
         };
 
         Event::dispatch(new $eventClass($detection));
