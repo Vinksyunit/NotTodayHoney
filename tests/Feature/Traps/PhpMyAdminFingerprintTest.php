@@ -2,29 +2,31 @@
 
 declare(strict_types=1);
 
-it('GET /phpmyadmin/ sets phpMyAdmin session cookie', function () {
+it('GET /phpmyadmin/ sets phpMyAdmin session cookie', function (): void {
     $response = $this->get('/phpmyadmin/');
 
     $response->assertCookie('phpMyAdmin');
 });
 
-it('GET /phpmyadmin/ sets pma_lang cookie with configured language', function () {
+it('GET /phpmyadmin/ sets pma_lang cookie with configured language', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.specific.fingerprint.lang', 'fr');
 
     $response = $this->get('/phpmyadmin/');
 
+    // assertPlainCookie: cookies are intentionally unencrypted fingerprinting values
     $response->assertPlainCookie('pma_lang', 'fr');
 });
 
-it('GET /phpmyadmin/ sets pmaCookieVer cookie with major version digit', function () {
+it('GET /phpmyadmin/ sets pmaCookieVer cookie with major version digit', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.specific.pma_version', '5.2.1');
 
     $response = $this->get('/phpmyadmin/');
 
+    // assertPlainCookie: cookies are intentionally unencrypted fingerprinting values
     $response->assertPlainCookie('pmaCookieVer', '5');
 });
 
-it('GET /phpmyadmin/ pma_lang cookie is not httpOnly', function () {
+it('GET /phpmyadmin/ pma_lang cookie is not httpOnly', function (): void {
     $response = $this->get('/phpmyadmin/');
 
     $cookie = collect($response->headers->getCookies())
@@ -34,7 +36,7 @@ it('GET /phpmyadmin/ pma_lang cookie is not httpOnly', function () {
     expect($cookie->isHttpOnly())->toBeFalse();
 });
 
-it('GET /phpmyadmin/ does not set cookies when fingerprint is disabled', function () {
+it('GET /phpmyadmin/ does not set cookies when fingerprint is disabled', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.specific.fingerprint.enabled', false);
 
     $response = $this->get('/phpmyadmin/');
