@@ -28,7 +28,7 @@ class WpRestApiIndexController
         return $this->applyFingerprint($request, $this->buildDiscoveryResponse($request));
     }
 
-    private function buildDiscoveryResponse(Request $request): JsonResponse
+    protected function buildDiscoveryResponse(Request $request): JsonResponse
     {
         $host = $request->getSchemeAndHttpHost();
 

@@ -27,6 +27,7 @@ if (config('not-today-honey.traps.wordpress.enabled', false)) {
     $fingerprintEnabled = config('not-today-honey.traps.wordpress.specific.fingerprint.enabled', false);
 
     if ($fingerprintEnabled && config('not-today-honey.traps.wordpress.specific.fingerprint.rest_api', false)) {
+        // Registered at root level intentionally — mimics real WordPress REST API path
         Route::get('wp-json/', WpRestApiIndexController::class);
     }
 }
