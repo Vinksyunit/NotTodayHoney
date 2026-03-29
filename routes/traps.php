@@ -10,6 +10,7 @@ use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginSu
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginSubmitController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiIndexController;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiUsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,7 @@ if (config('not-today-honey.traps.wordpress.enabled', false)) {
     if ($fingerprintEnabled && config('not-today-honey.traps.wordpress.specific.fingerprint.rest_api', false)) {
         // Registered at root level intentionally — mimics real WordPress REST API path
         Route::get('wp-json/', WpRestApiIndexController::class);
+        Route::get('wp-json/wp/v2/users', WpRestApiUsersController::class);
     }
 }
 
