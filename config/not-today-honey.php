@@ -51,31 +51,31 @@ return [
     | Intrusion Attempt: Tentative de login (quelconque).
     | Attacking: Utilisation d'un mot de passe présent dans la liste 'passwords'.
     |
+    | log_level: Niveau de log Laravel utilisé lors du déclenchement de l'alerte.
+    | Valeurs possibles : debug, info, notice, warning, error, critical, alert, emergency.
+    |
     */
     'alerts' => [
         'probing' => [
-            'threshold' => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
-            'time_window' => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
+            'threshold'        => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
+            'time_window'      => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_PROBING_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_PROBING_DURATION', 20), // Minutes
-            'notify' => env('NOT_TODAY_HONEY_PROBING_NOTIFY', false),
-            'channels' => explode(',', env('NOT_TODAY_HONEY_PROBING_CHANNELS', 'stack')),
+            'duration'         => env('NOT_TODAY_HONEY_PROBING_DURATION', 20), // Minutes
+            'log_level'        => env('NOT_TODAY_HONEY_PROBING_LOG_LEVEL', 'info'),
         ],
         'intrusion_attempt' => [
-            'threshold' => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
-            'time_window' => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440), // Minutes (default: 1 day)
+            'threshold'        => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
+            'time_window'      => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_INTRUSION_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 1440), // Minutes (24 hours)
-            'notify' => env('NOT_TODAY_HONEY_INTRUSION_NOTIFY', true),
-            'channels' => explode(',', env('NOT_TODAY_HONEY_INTRUSION_CHANNELS', 'stack,slack')),
+            'duration'         => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 1440), // Minutes (24 hours)
+            'log_level'        => env('NOT_TODAY_HONEY_INTRUSION_LOG_LEVEL', 'warning'),
         ],
         'attacking' => [
-            'threshold' => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
-            'time_window' => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
+            'threshold'        => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
+            'time_window'      => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_ATTACKING_BLOCK', true),
-            'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION', 43200), // Minutes (30 days)
-            'notify' => env('NOT_TODAY_HONEY_ATTACKING_NOTIFY', true),
-            'channels' => explode(',', env('NOT_TODAY_HONEY_ATTACKING_CHANNELS', 'stack,slack,mail')),
+            'duration'         => env('NOT_TODAY_HONEY_ATTACKING_DURATION', 43200), // Minutes (30 days)
+            'log_level'        => env('NOT_TODAY_HONEY_ATTACKING_LOG_LEVEL', 'critical'),
         ],
     ],
 
