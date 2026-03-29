@@ -124,6 +124,7 @@ it('does not block whitelisted IPs', function () {
 it('logs at info level when probing threshold is reached', function () {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 1);
+    config()->set('not-today-honey.alerts.probing.duration', 20);
 
     $this->service->recordAttempt('10.0.0.1', AlertLevel::PROBING);
 
@@ -140,6 +141,7 @@ it('logs at info level when probing threshold is reached', function () {
 it('logs at warning level when intrusion_attempt threshold is reached', function () {
     Log::spy();
     config()->set('not-today-honey.alerts.intrusion_attempt.threshold', 1);
+    config()->set('not-today-honey.alerts.intrusion_attempt.duration', 1440);
 
     $this->service->recordAttempt('10.0.0.2', AlertLevel::INTRUSION_ATTEMPT);
 
@@ -156,6 +158,7 @@ it('logs at warning level when intrusion_attempt threshold is reached', function
 it('logs at critical level when attacking threshold is reached', function () {
     Log::spy();
     config()->set('not-today-honey.alerts.attacking.threshold', 1);
+    config()->set('not-today-honey.alerts.attacking.duration', 43200);
 
     $this->service->recordAttempt('10.0.0.3', AlertLevel::ATTACKING);
 
@@ -172,6 +175,7 @@ it('logs at critical level when attacking threshold is reached', function () {
 it('uses log_level from config when logging', function () {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 1);
+    config()->set('not-today-honey.alerts.probing.duration', 20);
     config()->set('not-today-honey.alerts.probing.log_level', 'debug');
 
     $this->service->recordAttempt('10.0.0.4', AlertLevel::PROBING);
@@ -184,6 +188,7 @@ it('uses log_level from config when logging', function () {
 it('includes trap_name from latest trap attempt in log context', function () {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 2);
+    config()->set('not-today-honey.alerts.probing.duration', 20);
 
     $this->service->recordAttempt('10.0.0.5', AlertLevel::PROBING);
 
