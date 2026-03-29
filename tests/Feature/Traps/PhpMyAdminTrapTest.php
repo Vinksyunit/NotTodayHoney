@@ -6,14 +6,14 @@ use Vinksyunit\NotTodayHoney\Enums\TrapBehavior;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 use Vinksyunit\NotTodayHoney\Models\CredentialAttempt;
 
-it('GET /phpmyadmin records a PROBING attempt', function () {
+it('GET /phpmyadmin records a PROBING attempt', function (): void {
     $this->get('/phpmyadmin/');
 
     expect(AttackerDetection::count())->toBe(1);
     expect(AttackerDetection::first()->alert_level->value)->toBe('probing');
 });
 
-it('GET /phpmyadmin returns phpMyAdmin login form', function () {
+it('GET /phpmyadmin returns phpMyAdmin login form', function (): void {
     $response = $this->get('/phpmyadmin/');
 
     $response->assertStatus(200);
@@ -23,7 +23,7 @@ it('GET /phpmyadmin returns phpMyAdmin login form', function () {
     $response->assertSee('Log in', false);
 });
 
-it('GET /phpmyadmin shows configured server name', function () {
+it('GET /phpmyadmin shows configured server name', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.specific.server', 'db.example.com');
 
     $response = $this->get('/phpmyadmin/');
@@ -31,7 +31,7 @@ it('GET /phpmyadmin shows configured server name', function () {
     $response->assertSee('db.example.com', false);
 });
 
-it('POST /phpmyadmin/ returns phpMyAdmin-like error with username prefilled', function () {
+it('POST /phpmyadmin/ returns phpMyAdmin-like error with username prefilled', function (): void {
     $response = $this->post('/phpmyadmin/', [
         'pma_username' => 'root',
         'pma_password' => 'wrong',
@@ -43,7 +43,7 @@ it('POST /phpmyadmin/ returns phpMyAdmin-like error with username prefilled', fu
     $response->assertSee('root', false);
 });
 
-it('POST /phpmyadmin/ records credential attempt', function () {
+it('POST /phpmyadmin/ records credential attempt', function (): void {
     $this->post('/phpmyadmin/', [
         'pma_username' => 'root',
         'pma_password' => 'wrong',
@@ -53,7 +53,7 @@ it('POST /phpmyadmin/ records credential attempt', function () {
     expect(CredentialAttempt::first()->username_used)->toBe('root');
 });
 
-it('POST /phpmyadmin/ with known password returns fake dashboard on fake_success behavior', function () {
+it('POST /phpmyadmin/ with known password returns fake dashboard on fake_success behavior', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.login_success_behavior', TrapBehavior::FAKE_SUCCESS);
 
     $response = $this->post('/phpmyadmin/', ['pma_username' => 'admin', 'pma_password' => 'password']);
@@ -63,7 +63,7 @@ it('POST /phpmyadmin/ with known password returns fake dashboard on fake_success
     $response->assertSee('Database server', false);
 });
 
-it('POST /phpmyadmin/ with known password responds with configured login_success_behavior', function () {
+it('POST /phpmyadmin/ with known password responds with configured login_success_behavior', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.login_success_behavior', TrapBehavior::FORBIDDEN);
 
     $this->post('/phpmyadmin/', ['pma_username' => 'admin', 'pma_password' => 'password'])

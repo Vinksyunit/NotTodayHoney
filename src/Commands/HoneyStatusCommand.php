@@ -25,7 +25,7 @@ class HoneyStatusCommand extends Command
 
         $this->table(
             ['IP', 'Alert Level', 'Attempts', 'Blocked Until'],
-            $blocked->map(fn (AttackerDetection $d) => [
+            $blocked->map(fn (AttackerDetection $d): array => [
                 $d->ip,
                 $d->alert_level->value,
                 $d->attempt_count,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 
-it('reports as blocked when blocked_until is in the future', function () {
+it('reports as blocked when blocked_until is in the future', function (): void {
     $detection = AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),
@@ -19,7 +19,7 @@ it('reports as blocked when blocked_until is in the future', function () {
     expect($detection->getRemainingBlockTime())->toBeGreaterThan(0);
 });
 
-it('reports as not blocked when blocked_until is in the past', function () {
+it('reports as not blocked when blocked_until is in the past', function (): void {
     $detection = AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),
@@ -32,7 +32,7 @@ it('reports as not blocked when blocked_until is in the past', function () {
     expect($detection->getRemainingBlockTime())->toBeNull();
 });
 
-it('reports as not blocked when blocked_until is null', function () {
+it('reports as not blocked when blocked_until is null', function (): void {
     $detection = AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),
@@ -43,7 +43,7 @@ it('reports as not blocked when blocked_until is null', function () {
     expect($detection->isBlocked())->toBeFalse();
 });
 
-it('scope blocked returns only blocked detections', function () {
+it('scope blocked returns only blocked detections', function (): void {
     AttackerDetection::create([
         'ip' => '1.1.1.1', 'ip_hash' => hash('sha256', '1.1.1.1'),
         'alert_level' => AlertLevel::PROBING, 'attempt_count' => 1,
@@ -57,7 +57,7 @@ it('scope blocked returns only blocked detections', function () {
     expect(AttackerDetection::blocked()->count())->toBe(1);
 });
 
-it('scope forIpAndLevel returns detection within time window', function () {
+it('scope forIpAndLevel returns detection within time window', function (): void {
     $detection = AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),
@@ -70,7 +70,7 @@ it('scope forIpAndLevel returns detection within time window', function () {
     expect($found->id)->toBe($detection->id);
 });
 
-it('scope forIpAndLevel returns null for different alert level', function () {
+it('scope forIpAndLevel returns null for different alert level', function (): void {
     AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),

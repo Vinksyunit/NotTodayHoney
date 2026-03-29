@@ -7,18 +7,18 @@ use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 
-beforeEach(function () {
+beforeEach(function (): void {
     Route::middleware(HoneypotBlockMiddleware::class)
-        ->get('/protected', fn () => response('ok', 200));
+        ->get('/protected', fn (): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response => response('ok', 200));
 });
 
-it('allows non-blocked IPs through', function () {
+it('allows non-blocked IPs through', function (): void {
     $this->withServerVariables(['REMOTE_ADDR' => '9.9.9.9'])
         ->get('/protected')
         ->assertStatus(200);
 });
 
-it('blocks a blocked IP with 403', function () {
+it('blocks a blocked IP with 403', function (): void {
     AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),
@@ -33,7 +33,7 @@ it('blocks a blocked IP with 403', function () {
         ->assertStatus(403);
 });
 
-it('allows a previously blocked IP whose block has expired', function () {
+it('allows a previously blocked IP whose block has expired', function (): void {
     AttackerDetection::create([
         'ip' => '1.2.3.4',
         'ip_hash' => hash('sha256', '1.2.3.4'),
@@ -48,7 +48,7 @@ it('allows a previously blocked IP whose block has expired', function () {
         ->assertStatus(200);
 });
 
-it('never blocks whitelisted IPs', function () {
+it('never blocks whitelisted IPs', function (): void {
     config()->set('not-today-honey.whitelist', ['1.2.3.4']);
     AttackerDetection::create([
         'ip' => '1.2.3.4',

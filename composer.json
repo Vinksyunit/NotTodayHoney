@@ -69,8 +69,13 @@
         ],
         "lint": [
             "@php vendor/bin/pint --ansi",
-            "@php vendor/bin/phpstan analyse --verbose --ansi"
-        ]
+            "@php vendor/bin/phpstan analyse --verbose --ansi",
+            "@php vendor/bin/rector --ansi"
+        ],
+        "docs:install": "cd docs && npm install",
+        "docs:dev": "cd docs && npx vitepress dev",
+        "docs:build": "cd docs && npx vitepress build",
+        "docs:preview": "cd docs && npx vitepress preview"
     },
     "config": {
         "sort-packages": true,

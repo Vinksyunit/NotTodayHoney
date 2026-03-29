@@ -12,11 +12,11 @@ use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
 use Vinksyunit\NotTodayHoney\Models\TrapAttempt;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->service = app(AttackerDetectionService::class);
 });
 
-it('creates a new detection record on first attempt', function () {
+it('creates a new detection record on first attempt', function (): void {
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
 
     expect(AttackerDetection::count())->toBe(1);
@@ -25,7 +25,7 @@ it('creates a new detection record on first attempt', function () {
     expect($detection->alert_level)->toBe(AlertLevel::PROBING);
 });
 
-it('increments attempt count for same IP within time window', function () {
+it('increments attempt count for same IP within time window', function (): void {
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
 
@@ -33,14 +33,14 @@ it('increments attempt count for same IP within time window', function () {
     expect(AttackerDetection::first()->attempt_count)->toBe(2);
 });
 
-it('creates separate records for different IPs', function () {
+it('creates separate records for different IPs', function (): void {
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
     $this->service->recordAttempt('5.6.7.8', AlertLevel::PROBING);
 
     expect(AttackerDetection::count())->toBe(2);
 });
 
-it('stores both plain IP and hashed IP', function () {
+it('stores both plain IP and hashed IP', function (): void {
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
 
     $detection = AttackerDetection::first();
@@ -49,7 +49,7 @@ it('stores both plain IP and hashed IP', function () {
     expect($detection->ip_hash)->not->toBe('1.2.3.4');
 });
 
-it('dispatches AttackerProbingEvent when probing threshold is reached', function () {
+it('dispatches AttackerProbingEvent when probing threshold is reached', function (): void {
     Event::fake();
     config()->set('not-today-honey.alerts.probing.threshold', 2);
 
@@ -60,7 +60,7 @@ it('dispatches AttackerProbingEvent when probing threshold is reached', function
     Event::assertDispatched(AttackerProbingEvent::class);
 });
 
-it('dispatches AttackerIntrusionAttemptEvent when intrusion threshold is reached', function () {
+it('dispatches AttackerIntrusionAttemptEvent when intrusion threshold is reached', function (): void {
     Event::fake();
     config()->set('not-today-honey.alerts.intrusion_attempt.threshold', 1);
 
@@ -68,7 +68,7 @@ it('dispatches AttackerIntrusionAttemptEvent when intrusion threshold is reached
     Event::assertDispatched(AttackerIntrusionAttemptEvent::class);
 });
 
-it('dispatches AttackerAttackingEvent when attacking threshold is reached', function () {
+it('dispatches AttackerAttackingEvent when attacking threshold is reached', function (): void {
     Event::fake();
     config()->set('not-today-honey.alerts.attacking.threshold', 1);
 
@@ -76,7 +76,7 @@ it('dispatches AttackerAttackingEvent when attacking threshold is reached', func
     Event::assertDispatched(AttackerAttackingEvent::class);
 });
 
-it('blocks IP when threshold is reached', function () {
+it('blocks IP when threshold is reached', function (): void {
     config()->set('not-today-honey.alerts.probing.threshold', 1);
     config()->set('not-today-honey.alerts.probing.duration', 60);
 
@@ -85,7 +85,7 @@ it('blocks IP when threshold is reached', function () {
     expect($this->service->isBlocked('1.2.3.4'))->toBeTrue();
 });
 
-it('reports IP as not blocked before threshold', function () {
+it('reports IP as not blocked before threshold', function (): void {
     config()->set('not-today-honey.alerts.probing.threshold', 5);
 
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
@@ -93,9 +93,9 @@ it('reports IP as not blocked before threshold', function () {
     expect($this->service->isBlocked('1.2.3.4'))->toBeFalse();
 });
 
-it('blocks IP permanently when duration is null', function () {
+it('blocks IP permanently when duration is null', function (): void {
     config()->set('not-today-honey.alerts.attacking.threshold', 1);
-    config()->set('not-today-honey.alerts.attacking.duration', null);
+    config()->set('not-today-honey.alerts.attacking.duration');
 
     $this->service->recordAttempt('1.2.3.4', AlertLevel::ATTACKING);
 
@@ -103,7 +103,7 @@ it('blocks IP permanently when duration is null', function () {
     expect($detection->blocked_until->gt(now()->addYears(50)))->toBeTrue();
 });
 
-it('resets a detection record', function () {
+it('resets a detection record', function (): void {
     $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
     expect(AttackerDetection::count())->toBe(1);
 
@@ -111,7 +111,7 @@ it('resets a detection record', function () {
     expect(AttackerDetection::count())->toBe(0);
 });
 
-it('does not block whitelisted IPs', function () {
+it('does not block whitelisted IPs', function (): void {
     config()->set('not-today-honey.whitelist', ['127.0.0.1']);
     config()->set('not-today-honey.alerts.probing.threshold', 1);
 
@@ -121,7 +121,7 @@ it('does not block whitelisted IPs', function () {
     expect(AttackerDetection::count())->toBe(0);
 });
 
-it('logs at info level when probing threshold is reached', function () {
+it('logs at info level when probing threshold is reached', function (): void {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 1);
     config()->set('not-today-honey.alerts.probing.duration', 20);
@@ -130,14 +130,14 @@ it('logs at info level when probing threshold is reached', function () {
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) => $level === 'info' &&
+        ->withArgs(fn ($level, $message, $context): bool => $level === 'info' &&
             $message === '[NotTodayHoney] Attacker detected' &&
             $context['ip'] === '10.0.0.1' &&
             $context['alert_level'] === 'probing'
         );
 });
 
-it('logs at warning level when intrusion_attempt threshold is reached', function () {
+it('logs at warning level when intrusion_attempt threshold is reached', function (): void {
     Log::spy();
     config()->set('not-today-honey.alerts.intrusion_attempt.threshold', 1);
     config()->set('not-today-honey.alerts.intrusion_attempt.duration', 1440);
@@ -146,14 +146,14 @@ it('logs at warning level when intrusion_attempt threshold is reached', function
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) => $level === 'warning' &&
+        ->withArgs(fn ($level, $message, $context): bool => $level === 'warning' &&
             $message === '[NotTodayHoney] Attacker detected' &&
             $context['ip'] === '10.0.0.2' &&
             $context['alert_level'] === 'intrusion_attempt'
         );
 });
 
-it('logs at critical level when attacking threshold is reached', function () {
+it('logs at critical level when attacking threshold is reached', function (): void {
     Log::spy();
     config()->set('not-today-honey.alerts.attacking.threshold', 1);
     config()->set('not-today-honey.alerts.attacking.duration', 43200);
@@ -162,14 +162,14 @@ it('logs at critical level when attacking threshold is reached', function () {
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) => $level === 'critical' &&
+        ->withArgs(fn ($level, $message, $context): bool => $level === 'critical' &&
             $message === '[NotTodayHoney] Attacker detected' &&
             $context['ip'] === '10.0.0.3' &&
             $context['alert_level'] === 'attacking'
         );
 });
 
-it('uses log_level from config when logging', function () {
+it('uses log_level from config when logging', function (): void {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 1);
     config()->set('not-today-honey.alerts.probing.duration', 20);
@@ -179,10 +179,10 @@ it('uses log_level from config when logging', function () {
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) => $level === 'debug');
+        ->withArgs(fn ($level, $message, $context): bool => $level === 'debug');
 });
 
-it('includes trap_name from latest trap attempt in log context', function () {
+it('includes trap_name from latest trap attempt in log context', function (): void {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 2);
     config()->set('not-today-honey.alerts.probing.duration', 20);
@@ -203,6 +203,6 @@ it('includes trap_name from latest trap attempt in log context', function () {
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) => $context['trap_name'] === 'wordpress'
+        ->withArgs(fn ($level, $message, $context): bool => $context['trap_name'] === 'wordpress'
         );
 });

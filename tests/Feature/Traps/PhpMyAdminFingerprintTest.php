@@ -31,7 +31,7 @@ it('GET /phpmyadmin/ pma_lang cookie is not httpOnly', function (): void {
     $response = $this->get('/phpmyadmin/');
 
     $cookie = collect($response->headers->getCookies())
-        ->first(fn ($c) => $c->getName() === 'pma_lang');
+        ->first(fn ($c): bool => $c->getName() === 'pma_lang');
 
     expect($cookie)->not->toBeNull();
     expect($cookie->isHttpOnly())->toBeFalse();

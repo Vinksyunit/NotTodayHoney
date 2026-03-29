@@ -42,7 +42,7 @@ class WpRestApiUsersController
                 'name' => $slug,
                 'url' => '',
                 'description' => '',
-                'link' => "{$host}/?author={$id}",
+                'link' => sprintf('%s/?author=%d', $host, $id),
                 'slug' => $slug,
                 'avatar_urls' => [
                     '24' => 'https://secure.gravatar.com/avatar/?s=24&d=mm&r=g',
@@ -50,8 +50,8 @@ class WpRestApiUsersController
                     '96' => 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g',
                 ],
                 '_links' => [
-                    'self' => [['href' => "{$host}/wp-json/wp/v2/users/{$id}"]],
-                    'collection' => [['href' => "{$host}/wp-json/wp/v2/users"]],
+                    'self' => [['href' => sprintf('%s/wp-json/wp/v2/users/%d', $host, $id)]],
+                    'collection' => [['href' => $host . '/wp-json/wp/v2/users']],
                 ],
             ];
         }

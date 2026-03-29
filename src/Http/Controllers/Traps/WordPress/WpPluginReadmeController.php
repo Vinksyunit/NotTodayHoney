@@ -37,12 +37,12 @@ class WpPluginReadmeController
     private function buildReadmeResponse(string $plugin, string $version): Response
     {
         $content = implode("\n", [
-            "=== {$plugin} ===",
+            sprintf('=== %s ===', $plugin),
             'Contributors: contributors',
             'Tags: security, wordpress',
             'Requires at least: 5.0',
             'Tested up to: 6.4',
-            "Stable tag: {$version}",
+            'Stable tag: ' . $version,
             'License: GPLv2 or later',
             'License URI: https://www.gnu.org/licenses/gpl-2.0.html',
             '',
@@ -52,7 +52,7 @@ class WpPluginReadmeController
             '',
             '== Changelog ==',
             '',
-            "= {$version} =",
+            sprintf('= %s =', $version),
             '* Latest release.',
         ]);
 

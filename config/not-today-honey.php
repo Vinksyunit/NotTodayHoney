@@ -100,11 +100,11 @@ return [
             'specific' => [
                 'version' => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
                 'site_name' => env('NOT_TODAY_HONEY_WP_SITE_NAME', 'WordPress'),
-                'logo_url' => env('NOT_TODAY_HONEY_WP_LOGO_URL', null),
+                'logo_url' => env('NOT_TODAY_HONEY_WP_LOGO_URL'),
                 'fingerprint' => [
-                    'enabled' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_ENABLED', false),
+                    'enabled' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_ENABLED', true),
                     'php_version' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_PHP_VERSION', '8.1.0'),
-                    'rest_api' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_REST_API', false),
+                    'rest_api' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_REST_API', true),
                     'fake_users' => array_filter(explode(',', env('NOT_TODAY_HONEY_WP_FINGERPRINT_FAKE_USERS', 'admin'))),
                     'plugins' => [], // Configured programmatically; not settable via .env
                 ],
@@ -119,7 +119,7 @@ return [
                 'pma_version' => env('NOT_TODAY_HONEY_PMA_VERSION', '5.2.1'),
                 'server' => env('NOT_TODAY_HONEY_PMA_SERVER', 'localhost'),
                 'fingerprint' => [
-                    'enabled' => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_ENABLED', false),
+                    'enabled' => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_ENABLED', true),
                     'lang' => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_LANG', 'en'),
                 ],
             ],
@@ -149,7 +149,7 @@ return [
     |
     */
     'storage' => [
-        'connection' => env('NOT_TODAY_HONEY_DB_CONNECTION', null),
+        'connection' => env('NOT_TODAY_HONEY_DB_CONNECTION'),
         'tables' => [
             'attacker_detections' => env('NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS', 'nt_honey_attacker_detections'),
             'trap_attempts' => env('NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS', 'nt_honey_trap_attempts'),

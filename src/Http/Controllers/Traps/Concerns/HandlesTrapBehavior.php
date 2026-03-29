@@ -75,7 +75,7 @@ trait HandlesTrapBehavior
         );
 
         if ($credentialCheck['password_matched']) {
-            $trapConfig = config("not-today-honey.traps.{$this->getTrapName()}");
+            $trapConfig = config('not-today-honey.traps.'.$this->getTrapName());
 
             return $this->respondWithBehavior($trapConfig['login_success_behavior'], $request);
         }
@@ -224,10 +224,11 @@ trait HandlesTrapBehavior
                 if (ob_get_level() > 0) {
                     ob_flush();
                 }
+
                 flush();
                 sleep(5);
 
-                if (connection_aborted()) {
+                if (connection_aborted() !== 0) {
                     break;
                 }
             }

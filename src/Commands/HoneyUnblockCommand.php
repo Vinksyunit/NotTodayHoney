@@ -23,13 +23,13 @@ class HoneyUnblockCommand extends Command
         $ip = $this->argument('ip');
 
         if (! $this->service->isBlocked($ip)) {
-            $this->warn("IP {$ip} is not currently blocked.");
+            $this->warn(sprintf('IP %s is not currently blocked.', $ip));
 
             return self::SUCCESS;
         }
 
         $this->service->resetDetection($ip);
-        $this->info("IP {$ip} has been unblocked.");
+        $this->info(sprintf('IP %s has been unblocked.', $ip));
 
         return self::SUCCESS;
     }

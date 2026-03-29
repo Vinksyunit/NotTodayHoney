@@ -89,7 +89,7 @@ class AttackerDetectionService
         }
 
         // Log the detection to the application's default log channel
-        $logLevel = config("not-today-honey.alerts.{$level->value}.log_level", 'warning');
+        $logLevel = config(sprintf('not-today-honey.alerts.%s.log_level', $level->value), 'warning');
         $trapName = $detection->trapAttempts()->latest()->value('trap_name');
 
         Log::log($logLevel, '[NotTodayHoney] Attacker detected', [

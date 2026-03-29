@@ -15,7 +15,7 @@ trait HasHttpFingerprint
     protected function applyFingerprint(Request $request, SymfonyResponse $response): SymfonyResponse
     {
         $trapName = $this->getTrapName();
-        $enabled = config("not-today-honey.traps.{$trapName}.specific.fingerprint.enabled", false);
+        $enabled = config(sprintf('not-today-honey.traps.%s.specific.fingerprint.enabled', $trapName), false);
 
         if (! $enabled) {
             return $response;
@@ -31,10 +31,10 @@ trait HasHttpFingerprint
     private function applyWordPressFingerprint(Request $request, SymfonyResponse $response): SymfonyResponse
     {
         $host = $request->getSchemeAndHttpHost();
-        $response->headers->set('Link', "<{$host}/wp-json/>; rel=\"https://api.w.org/\"");
+        $response->headers->set('Link', sprintf('<%s/wp-json/>; rel="https://api.w.org/"', $host));
 
         $phpVersion = config('not-today-honey.traps.wordpress.specific.fingerprint.php_version', '8.1.0');
-        $response->headers->set('X-Powered-By', "PHP/{$phpVersion}");
+        $response->headers->set('X-Powered-By', 'PHP/'.$phpVersion);
 
         return $response;
     }
@@ -43,7 +43,7 @@ trait HasHttpFingerprint
     {
         $pmaVersion = config('not-today-honey.traps.phpmyadmin.specific.pma_version', '5.2.1');
         $lang = config('not-today-honey.traps.phpmyadmin.specific.fingerprint.lang', 'en');
-        $cookieVer = (string) explode('.', $pmaVersion)[0];
+        $cookieVer = explode('.', $pmaVersion)[0];
 
         $response->headers->setCookie(new Cookie('phpMyAdmin', (string) Str::uuid(), httpOnly: true));
         $response->headers->setCookie(new Cookie('pma_lang', $lang, httpOnly: false));
