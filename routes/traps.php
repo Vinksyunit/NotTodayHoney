@@ -9,6 +9,7 @@ use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginCo
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginSubmitController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginSubmitController;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpPluginReadmeController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiIndexController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiUsersController;
 
@@ -31,6 +32,12 @@ if (config('not-today-honey.traps.wordpress.enabled', false)) {
         // Registered at root level intentionally — mimics real WordPress REST API path
         Route::get('wp-json/', WpRestApiIndexController::class);
         Route::get('wp-json/wp/v2/users', WpRestApiUsersController::class);
+    }
+
+    $plugins = config('not-today-honey.traps.wordpress.specific.fingerprint.plugins', []);
+    if ($fingerprintEnabled && ! empty($plugins)) {
+        // Registered at root level intentionally — mimics real WordPress plugin directory structure
+        Route::get('wp-content/plugins/{plugin}/readme.txt', WpPluginReadmeController::class);
     }
 }
 
