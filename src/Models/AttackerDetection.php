@@ -7,6 +7,7 @@ namespace Vinksyunit\NotTodayHoney\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
 /**
@@ -15,10 +16,10 @@ use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
  * @property string $ip_hash
  * @property int $attempt_count
  * @property AlertLevel $alert_level
- * @property \Illuminate\Support\Carbon|null $blocked_at
- * @property \Illuminate\Support\Carbon|null $blocked_until
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $blocked_at
+ * @property Carbon|null $blocked_until
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class AttackerDetection extends Model
 {
