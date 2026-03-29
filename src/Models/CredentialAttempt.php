@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CredentialAttempt extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'nt_honey_credential_attempts';
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->table = config('not-today-honey.storage.tables.credential_attempts', 'nt_honey_credential_attempts');
+        $this->connection = config('not-today-honey.storage.connection');
+    }
 
     /**
      * Indicates if the model should be timestamped.

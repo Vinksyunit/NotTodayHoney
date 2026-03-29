@@ -129,10 +129,21 @@ return [
     |--------------------------------------------------------------------------
     | Storage Settings
     |--------------------------------------------------------------------------
+    |
+    | 'connection' : Connexion de base de données à utiliser (null = connexion
+    |                par défaut de l'application).
+    |
+    | 'tables' : Noms des tables utilisées par le package. Utile si vous avez
+    |            des préfixes de tables ou des conventions de nommage spécifiques.
+    |
     */
     'storage' => [
-        'driver' => env('NOT_TODAY_HONEY_STORAGE', 'database'),
-        'table' => env('NOT_TODAY_HONEY_TABLE', 'not_today_honey_logs'),
+        'connection' => env('NOT_TODAY_HONEY_DB_CONNECTION', null),
+        'tables' => [
+            'attacker_detections' => env('NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS', 'nt_honey_attacker_detections'),
+            'trap_attempts' => env('NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS', 'nt_honey_trap_attempts'),
+            'credential_attempts' => env('NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS', 'nt_honey_credential_attempts'),
+        ],
     ],
 
 ];

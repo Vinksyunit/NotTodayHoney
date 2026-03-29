@@ -25,12 +25,12 @@ class AttackerDetection extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'nt_honey_attacker_detections';
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->table = config('not-today-honey.storage.tables.attacker_detections', 'nt_honey_attacker_detections');
+        $this->connection = config('not-today-honey.storage.connection');
+    }
 
     /**
      * The attributes that are mass assignable.

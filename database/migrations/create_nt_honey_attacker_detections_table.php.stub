@@ -6,9 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public string $connection;
+
+    public function __construct()
+    {
+        $this->connection = config('not-today-honey.storage.connection');
+    }
+
     public function up()
     {
-        Schema::create('nt_honey_attacker_detections', function (Blueprint $table) {
+        $table = config('not-today-honey.storage.tables.attacker_detections', 'nt_honey_attacker_detections');
+
+        Schema::connection($this->connection)->create($table, function (Blueprint $table) {
             $table->id();
             $table->string('ip', 45); // IPv4 or IPv6
             $table->string('ip_hash', 64)->index(); // SHA256 hash of IP
@@ -27,6 +36,8 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('nt_honey_attacker_detections');
+        $table = config('not-today-honey.storage.tables.attacker_detections', 'nt_honey_attacker_detections');
+
+        Schema::connection($this->connection)->dropIfExists($table);
     }
 };

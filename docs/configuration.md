@@ -85,9 +85,22 @@ See [Traps](/traps) for per-trap details and behavior options.
 
 ```php
 'storage' => [
-    'driver' => env('NOT_TODAY_HONEY_STORAGE', 'database'),
-    'table' => env('NOT_TODAY_HONEY_TABLE', 'not_today_honey_logs'),
+    'connection' => env('NOT_TODAY_HONEY_DB_CONNECTION', null),
+    'tables' => [
+        'attacker_detections' => env('NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS', 'nt_honey_attacker_detections'),
+        'trap_attempts'       => env('NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS', 'nt_honey_trap_attempts'),
+        'credential_attempts' => env('NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS', 'nt_honey_credential_attempts'),
+    ],
 ],
 ```
 
-Only the `database` driver is supported. The `table` key controls the log table name.
+**`connection`** — database connection to use. Defaults to `null`, which uses the application's default connection. Set this if you want to isolate honeypot data on a separate database.
+
+**`tables`** — table names for each of the three storage models. Override them if your project has a table prefix or naming convention:
+
+```env
+NOT_TODAY_HONEY_DB_CONNECTION=security
+NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS=honey_attackers
+NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS=honey_traps
+NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS=honey_credentials
+```
