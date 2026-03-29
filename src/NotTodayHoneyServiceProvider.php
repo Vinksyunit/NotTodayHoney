@@ -6,7 +6,8 @@ namespace Vinksyunit\NotTodayHoney;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Vinksyunit\NotTodayHoney\Commands\NotTodayHoneyCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyStatusCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyUnblockCommand;
 use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
 
 class NotTodayHoneyServiceProvider extends PackageServiceProvider
@@ -25,7 +26,10 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
             ->hasMigration('create_nt_honey_attacker_detections_table')
             ->hasMigration('create_nt_honey_trap_attempts_table')
             ->hasMigration('create_nt_honey_credential_attempts_table')
-            ->hasCommand(NotTodayHoneyCommand::class);
+            ->hasCommands([
+                HoneyStatusCommand::class,
+                HoneyUnblockCommand::class,
+            ]);
     }
 
     public function packageBooted(): void
