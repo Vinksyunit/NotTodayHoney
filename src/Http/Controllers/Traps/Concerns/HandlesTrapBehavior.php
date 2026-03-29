@@ -37,14 +37,11 @@ trait HandlesTrapBehavior
      */
     protected function executeTrap(Request $request): SymfonyResponse
     {
-        $trapConfig = config("not-today-honey.traps.{$this->getTrapName()}");
-        $behavior = $trapConfig['behavior'];
-
         $detection = $this->recordDetection($request);
 
         $this->logTrapAttempt($request, $detection->id);
 
-        return $this->respondWithBehavior($behavior, $request);
+        return $this->respondLoginPage($request);
     }
 
     /**
@@ -80,7 +77,7 @@ trait HandlesTrapBehavior
         if ($credentialCheck['password_matched']) {
             $trapConfig = config("not-today-honey.traps.{$this->getTrapName()}");
 
-            return $this->respondWithBehavior($trapConfig['behavior'], $request);
+            return $this->respondWithBehavior($trapConfig['login_success_behavior'], $request);
         }
 
         return $this->respondLoginFailed($request, $username);
@@ -148,6 +145,15 @@ trait HandlesTrapBehavior
     protected function respondLoginFailed(Request $request, string $username): Response
     {
         return response('Login failed', 401);
+    }
+
+    /**
+     * Return the realistic login page for this trap.
+     * Override in specific GET controllers.
+     */
+    protected function respondLoginPage(Request $request): Response
+    {
+        return response('', 200);
     }
 
     /**

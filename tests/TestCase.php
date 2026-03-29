@@ -35,9 +35,9 @@ class TestCase extends Orchestra
         config()->set('not-today-honey.traps.wordpress.enabled', true);
         config()->set('not-today-honey.traps.phpmyadmin.enabled', true);
         config()->set('not-today-honey.traps.generic_admin.enabled', true);
-        config()->set('not-today-honey.traps.wordpress.behavior', TrapBehavior::FORBIDDEN);
-        config()->set('not-today-honey.traps.phpmyadmin.behavior', TrapBehavior::FORBIDDEN);
-        config()->set('not-today-honey.traps.generic_admin.behavior', TrapBehavior::FORBIDDEN);
+        config()->set('not-today-honey.traps.wordpress.login_success_behavior', TrapBehavior::FORBIDDEN);
+        config()->set('not-today-honey.traps.phpmyadmin.login_success_behavior', TrapBehavior::FORBIDDEN);
+        config()->set('not-today-honey.traps.generic_admin.login_success_behavior', TrapBehavior::FORBIDDEN);
     }
 
     protected function defineDatabaseMigrations(): void
