@@ -9,8 +9,8 @@ return [
     | IPs Whitelist
     |--------------------------------------------------------------------------
     |
-    | Les IPs qui ne seront jamais bloquées. Elles déclenchent les événements
-    | avec l'attribut 'is_test' à true.
+    | IPs that will never be blocked. They trigger events
+    | with the 'is_test' attribute set to true.
     |
     */
     'whitelist' => explode(',', env('NOT_TODAY_HONEY_WHITELIST', '127.0.0.1')),
@@ -20,11 +20,11 @@ return [
     | Leaked Credentials Database
     |--------------------------------------------------------------------------
     |
-    | 'usernames' : Liste des logins que vous surveillez (ex: admin, root).
-    | 'passwords' : Liste de hashs de mots de passe connus pour être dans des leaks.
+    | 'usernames' : List of monitored logins (e.g.: admin, root).
+    | 'passwords' : List of password hashes known to appear in credential leaks.
     |
-    | Si un mot de passe de cette liste est utilisé -> Niveau "Attacking" direct.
-    | Si le username match AUSSI -> Possibilité d'afficher un 'fake_success'.
+    | If a password from this list is used -> "Attacking" level triggered immediately.
+    | If the username also matches -> A 'fake_success' response may be displayed.
     |
     */
     'credentials' => [
@@ -47,12 +47,12 @@ return [
     | Alert Levels Configuration
     |--------------------------------------------------------------------------
     |
-    | Probing: Simple visite du piège (reconnaissance/exploration).
-    | Intrusion Attempt: Tentative de login (quelconque).
-    | Attacking: Utilisation d'un mot de passe présent dans la liste 'passwords'.
+    | Probing: Simple visit to the trap (reconnaissance/exploration).
+    | Intrusion Attempt: Any login attempt.
+    | Attacking: Use of a password present in the 'passwords' list.
     |
-    | log_level: Niveau de log Laravel utilisé lors du déclenchement de l'alerte.
-    | Valeurs possibles : debug, info, notice, warning, error, critical, alert, emergency.
+    | log_level: Laravel log level used when the alert is triggered.
+    | Possible values: debug, info, notice, warning, error, critical, alert, emergency.
     |
     */
     'alerts' => [
@@ -84,11 +84,11 @@ return [
     | Honeypot Traps
     |--------------------------------------------------------------------------
     |
-    | Comportements disponibles après un faux login réussi :
-    | '403'             -> Accès interdit.
-    | '500'             -> Simule une erreur serveur.
-    | 'infinite_loading'-> Fait ramer la requête jusqu'au timeout.
-    | 'fake_success'    -> Simule un dashboard vide (comportement par défaut).
+    | Available behaviors after a fake successful login:
+    | '403'             -> Access forbidden.
+    | '500'             -> Simulates a server error.
+    | 'infinite_loading'-> Stalls the request until timeout.
+    | 'fake_success'    -> Simulates an empty dashboard (default behavior).
     |
     */
     'traps' => [
@@ -130,11 +130,11 @@ return [
     | Storage Settings
     |--------------------------------------------------------------------------
     |
-    | 'connection' : Connexion de base de données à utiliser (null = connexion
-    |                par défaut de l'application).
+    | 'connection' : Database connection to use (null = application's
+    |                default connection).
     |
-    | 'tables' : Noms des tables utilisées par le package. Utile si vous avez
-    |            des préfixes de tables ou des conventions de nommage spécifiques.
+    | 'tables' : Table names used by the package. Useful if you have
+    |            table prefixes or specific naming conventions.
     |
     */
     'storage' => [
