@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'NotTodayHoney',
   description: 'Laravel honeypot package to detect and block attackers',
   srcExclude: ['superpowers/**'],
+  ignoreDeadLinks: true,
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
