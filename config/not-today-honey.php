@@ -57,25 +57,25 @@ return [
     */
     'alerts' => [
         'probing' => [
-            'threshold'        => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
-            'time_window'      => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
+            'threshold' => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
+            'time_window' => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_PROBING_BLOCK', true),
-            'duration'         => env('NOT_TODAY_HONEY_PROBING_DURATION', 20), // Minutes
-            'log_level'        => env('NOT_TODAY_HONEY_PROBING_LOG_LEVEL', 'info'),
+            'duration' => env('NOT_TODAY_HONEY_PROBING_DURATION', 20), // Minutes
+            'log_level' => env('NOT_TODAY_HONEY_PROBING_LOG_LEVEL', 'info'),
         ],
         'intrusion_attempt' => [
-            'threshold'        => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
-            'time_window'      => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440), // Minutes (default: 1 day)
+            'threshold' => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
+            'time_window' => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_INTRUSION_BLOCK', true),
-            'duration'         => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 1440), // Minutes (24 hours)
-            'log_level'        => env('NOT_TODAY_HONEY_INTRUSION_LOG_LEVEL', 'warning'),
+            'duration' => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 1440), // Minutes (24 hours)
+            'log_level' => env('NOT_TODAY_HONEY_INTRUSION_LOG_LEVEL', 'warning'),
         ],
         'attacking' => [
-            'threshold'        => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
-            'time_window'      => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
+            'threshold' => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
+            'time_window' => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440), // Minutes (default: 1 day)
             'mark_as_insecure' => env('NOT_TODAY_HONEY_ATTACKING_BLOCK', true),
-            'duration'         => env('NOT_TODAY_HONEY_ATTACKING_DURATION', 43200), // Minutes (30 days)
-            'log_level'        => env('NOT_TODAY_HONEY_ATTACKING_LOG_LEVEL', 'critical'),
+            'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION', 43200), // Minutes (30 days)
+            'log_level' => env('NOT_TODAY_HONEY_ATTACKING_LOG_LEVEL', 'critical'),
         ],
     ],
 

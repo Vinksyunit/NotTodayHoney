@@ -130,8 +130,7 @@ it('logs at info level when probing threshold is reached', function () {
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) =>
-            $level === 'info' &&
+        ->withArgs(fn ($level, $message, $context) => $level === 'info' &&
             $message === '[NotTodayHoney] Attacker detected' &&
             $context['ip'] === '10.0.0.1' &&
             $context['alert_level'] === 'probing'
@@ -147,8 +146,7 @@ it('logs at warning level when intrusion_attempt threshold is reached', function
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) =>
-            $level === 'warning' &&
+        ->withArgs(fn ($level, $message, $context) => $level === 'warning' &&
             $message === '[NotTodayHoney] Attacker detected' &&
             $context['ip'] === '10.0.0.2' &&
             $context['alert_level'] === 'intrusion_attempt'
@@ -164,8 +162,7 @@ it('logs at critical level when attacking threshold is reached', function () {
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) =>
-            $level === 'critical' &&
+        ->withArgs(fn ($level, $message, $context) => $level === 'critical' &&
             $message === '[NotTodayHoney] Attacker detected' &&
             $context['ip'] === '10.0.0.3' &&
             $context['alert_level'] === 'attacking'
@@ -195,18 +192,17 @@ it('includes trap_name from latest trap attempt in log context', function () {
     $detection = AttackerDetection::first();
     TrapAttempt::create([
         'attacker_detection_id' => $detection->id,
-        'trap_name'             => 'wordpress',
-        'path'                  => '/wp-login.php',
-        'method'                => 'GET',
-        'headers'               => [],
-        'created_at'            => now(),
+        'trap_name' => 'wordpress',
+        'path' => '/wp-login.php',
+        'method' => 'GET',
+        'headers' => [],
+        'created_at' => now(),
     ]);
 
     $this->service->recordAttempt('10.0.0.5', AlertLevel::PROBING);
 
     Log::shouldHaveReceived('log')
         ->once()
-        ->withArgs(fn ($level, $message, $context) =>
-            $context['trap_name'] === 'wordpress'
+        ->withArgs(fn ($level, $message, $context) => $context['trap_name'] === 'wordpress'
         );
 });
