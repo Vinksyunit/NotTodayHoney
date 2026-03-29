@@ -84,11 +84,11 @@ return [
     | Honeypot Traps
     |--------------------------------------------------------------------------
     |
-    | Comportements disponibles :
+    | Comportements disponibles après un faux login réussi :
     | '403'             -> Accès interdit.
     | '500'             -> Simule une erreur serveur.
     | 'infinite_loading'-> Fait ramer la requête jusqu'au timeout.
-    | 'fake_success'    -> Simule un dashboard vide (si le username match).
+    | 'fake_success'    -> Simule un dashboard vide (comportement par défaut).
     |
     */
     'traps' => [
@@ -96,7 +96,7 @@ return [
         'wordpress' => [
             'enabled' => env('NOT_TODAY_HONEY_WP_ENABLED', true),
             'path' => env('NOT_TODAY_HONEY_WP_PATH', '/wp-admin'),
-            'behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_WP_BEHAVIOR', '403')),
+            'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_WP_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
             'specific' => [
                 'version' => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
             ],
@@ -105,7 +105,7 @@ return [
         'phpmyadmin' => [
             'enabled' => env('NOT_TODAY_HONEY_PMA_ENABLED', true),
             'path' => env('NOT_TODAY_HONEY_PMA_PATH', '/phpmyadmin'),
-            'behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_PMA_BEHAVIOR', '403')),
+            'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_PMA_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
             'specific' => [
                 'pma_version' => env('NOT_TODAY_HONEY_PMA_VERSION', '5.2.1'),
             ],
@@ -114,7 +114,7 @@ return [
         'generic_admin' => [
             'enabled' => env('NOT_TODAY_HONEY_GENERIC_ENABLED', true),
             'path' => env('NOT_TODAY_HONEY_GENERIC_PATH', '/admin'),
-            'behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_GENERIC_BEHAVIOR', '403')),
+            'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_GENERIC_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
             'specific' => [
                 'title' => env('NOT_TODAY_HONEY_GENERIC_TITLE', 'Control Panel'),
             ],
