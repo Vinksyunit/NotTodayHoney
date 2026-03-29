@@ -101,6 +101,13 @@ return [
                 'version' => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
                 'site_name' => env('NOT_TODAY_HONEY_WP_SITE_NAME', 'WordPress'),
                 'logo_url' => env('NOT_TODAY_HONEY_WP_LOGO_URL', null),
+                'fingerprint' => [
+                    'enabled' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_ENABLED', false),
+                    'php_version' => env('NOT_TODAY_HONEY_WP_PHP_VERSION', '8.1.0'),
+                    'rest_api' => env('NOT_TODAY_HONEY_WP_REST_API', false),
+                    'fake_users' => explode(',', env('NOT_TODAY_HONEY_WP_FAKE_USERS', 'admin')),
+                    'plugins' => [],
+                ],
             ],
         ],
 
@@ -111,6 +118,10 @@ return [
             'specific' => [
                 'pma_version' => env('NOT_TODAY_HONEY_PMA_VERSION', '5.2.1'),
                 'server' => env('NOT_TODAY_HONEY_PMA_SERVER', 'localhost'),
+                'fingerprint' => [
+                    'enabled' => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_ENABLED', false),
+                    'lang' => env('NOT_TODAY_HONEY_PMA_LANG', 'en'),
+                ],
             ],
         ],
 

@@ -38,6 +38,12 @@ class TestCase extends Orchestra
         config()->set('not-today-honey.traps.wordpress.login_success_behavior', TrapBehavior::FORBIDDEN);
         config()->set('not-today-honey.traps.phpmyadmin.login_success_behavior', TrapBehavior::FORBIDDEN);
         config()->set('not-today-honey.traps.generic_admin.login_success_behavior', TrapBehavior::FORBIDDEN);
+        config()->set('not-today-honey.traps.wordpress.specific.fingerprint.enabled', true);
+        config()->set('not-today-honey.traps.wordpress.specific.fingerprint.rest_api', true);
+        config()->set('not-today-honey.traps.wordpress.specific.fingerprint.fake_users', ['admin', 'editor']);
+        config()->set('not-today-honey.traps.wordpress.specific.fingerprint.plugins', ['really-simple-ssl' => '9.1.1']);
+        config()->set('not-today-honey.traps.phpmyadmin.specific.fingerprint.enabled', true);
+        config()->set('not-today-honey.traps.phpmyadmin.specific.fingerprint.lang', 'en');
     }
 
     protected function defineDatabaseMigrations(): void
