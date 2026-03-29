@@ -116,4 +116,5 @@ it('does not block whitelisted IPs', function () {
     $this->service->recordAttempt('127.0.0.1', AlertLevel::PROBING);
 
     expect($this->service->isBlocked('127.0.0.1'))->toBeFalse();
+    expect(AttackerDetection::count())->toBe(0);
 });

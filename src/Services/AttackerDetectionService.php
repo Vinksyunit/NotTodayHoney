@@ -24,9 +24,9 @@ class AttackerDetectionService
         $whitelist = config('not-today-honey.whitelist', []);
         if (in_array($ip, $whitelist, true)) {
             return new AttackerDetection([
-                'ip'            => $ip,
-                'ip_hash'       => $this->hashIp($ip),
-                'alert_level'   => $level,
+                'ip' => $ip,
+                'ip_hash' => $this->hashIp($ip),
+                'alert_level' => $level,
                 'attempt_count' => 0,
             ]);
         }
@@ -36,11 +36,7 @@ class AttackerDetectionService
         $timeWindow = $config[$level->value]['time_window'] ?? 1440;
 
         // Try to find an existing detection for this IP, level, and within time window
-        $detection = AttackerDetection::where('ip_hash', $ipHash)
-            ->where('alert_level', $level)
-            ->where('created_at', '>', now()->subMinutes($timeWindow))
-            ->latest()
-            ->first();
+        $detection = AttackerDetection::forIpAndLevel($ipHash, $level, $timeWindow);
 
         if ($detection instanceof AttackerDetection) {
             // Found existing detection within time window - increment counter
