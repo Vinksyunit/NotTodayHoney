@@ -120,12 +120,16 @@ trait HandlesTrapBehavior
      * Log credential attempt to database.
      */
     protected function logCredentialAttempt(
-        int $detectionId,
+        ?int $detectionId,
         string $username,
         ?string $credentialId,
         bool $usernameMatched,
         bool $passwordMatched
     ): void {
+        if ($detectionId === null) {
+            return;
+        }
+
         CredentialAttempt::create([
             'attacker_detection_id' => $detectionId,
             'credential_id' => $credentialId,
@@ -148,8 +152,12 @@ trait HandlesTrapBehavior
     /**
      * Log the trap attempt to database.
      */
-    protected function logTrapAttempt(Request $request, int $detectionId): void
+    protected function logTrapAttempt(Request $request, ?int $detectionId): void
     {
+        if ($detectionId === null) {
+            return;
+        }
+
         TrapAttempt::create([
             'attacker_detection_id' => $detectionId,
             'trap_name' => $this->getTrapName(),

@@ -21,14 +21,28 @@ class AttackerDetectionService
      */
     public function recordAttempt(string $ip, AlertLevel $level): AttackerDetection
     {
+        $whitelist = config('not-today-honey.whitelist', []);
+        if (in_array($ip, $whitelist, true)) {
+            return new AttackerDetection([
+                'ip'            => $ip,
+                'ip_hash'       => $this->hashIp($ip),
+                'alert_level'   => $level,
+                'attempt_count' => 0,
+            ]);
+        }
+
         $ipHash = $this->hashIp($ip);
         $config = config('not-today-honey.alerts');
         $timeWindow = $config[$level->value]['time_window'] ?? 1440;
 
         // Try to find an existing detection for this IP, level, and within time window
-        $detection = AttackerDetection::forIpAndLevel($ipHash, $level, $timeWindow);
+        $detection = AttackerDetection::where('ip_hash', $ipHash)
+            ->where('alert_level', $level)
+            ->where('created_at', '>', now()->subMinutes($timeWindow))
+            ->latest()
+            ->first();
 
-        if ($detection) {
+        if ($detection instanceof AttackerDetection) {
             // Found existing detection within time window - increment counter
             $detection->increment('attempt_count');
             $detection->refresh();
