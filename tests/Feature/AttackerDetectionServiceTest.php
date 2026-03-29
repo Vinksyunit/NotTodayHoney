@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
 use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
 use Vinksyunit\NotTodayHoney\Events\AttackerProbingEvent;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
+use Vinksyunit\NotTodayHoney\Models\TrapAttempt;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
 beforeEach(function () {
@@ -117,4 +119,85 @@ it('does not block whitelisted IPs', function () {
 
     expect($this->service->isBlocked('127.0.0.1'))->toBeFalse();
     expect(AttackerDetection::count())->toBe(0);
+});
+
+it('logs at info level when probing threshold is reached', function () {
+    Log::spy();
+    config()->set('not-today-honey.alerts.probing.threshold', 1);
+
+    $this->service->recordAttempt('10.0.0.1', AlertLevel::PROBING);
+
+    Log::shouldHaveReceived('log')
+        ->once()
+        ->withArgs(fn ($level, $message, $context) =>
+            $level === 'info' &&
+            $message === '[NotTodayHoney] Attacker detected' &&
+            $context['ip'] === '10.0.0.1' &&
+            $context['alert_level'] === 'probing'
+        );
+});
+
+it('logs at warning level when intrusion_attempt threshold is reached', function () {
+    Log::spy();
+    config()->set('not-today-honey.alerts.intrusion_attempt.threshold', 1);
+
+    $this->service->recordAttempt('10.0.0.2', AlertLevel::INTRUSION_ATTEMPT);
+
+    Log::shouldHaveReceived('log')
+        ->once()
+        ->withArgs(fn ($level, $message, $context) =>
+            $level === 'warning' &&
+            $context['alert_level'] === 'intrusion_attempt'
+        );
+});
+
+it('logs at critical level when attacking threshold is reached', function () {
+    Log::spy();
+    config()->set('not-today-honey.alerts.attacking.threshold', 1);
+
+    $this->service->recordAttempt('10.0.0.3', AlertLevel::ATTACKING);
+
+    Log::shouldHaveReceived('log')
+        ->once()
+        ->withArgs(fn ($level, $message, $context) =>
+            $level === 'critical' &&
+            $context['alert_level'] === 'attacking'
+        );
+});
+
+it('uses log_level from config when logging', function () {
+    Log::spy();
+    config()->set('not-today-honey.alerts.probing.threshold', 1);
+    config()->set('not-today-honey.alerts.probing.log_level', 'debug');
+
+    $this->service->recordAttempt('10.0.0.4', AlertLevel::PROBING);
+
+    Log::shouldHaveReceived('log')
+        ->once()
+        ->withArgs(fn ($level, $message, $context) => $level === 'debug');
+});
+
+it('includes trap_name from latest trap attempt in log context', function () {
+    Log::spy();
+    config()->set('not-today-honey.alerts.probing.threshold', 2);
+
+    $this->service->recordAttempt('10.0.0.5', AlertLevel::PROBING);
+
+    $detection = AttackerDetection::first();
+    TrapAttempt::create([
+        'attacker_detection_id' => $detection->id,
+        'trap_name'             => 'wordpress',
+        'path'                  => '/wp-login.php',
+        'method'                => 'GET',
+        'headers'               => [],
+        'created_at'            => now(),
+    ]);
+
+    $this->service->recordAttempt('10.0.0.5', AlertLevel::PROBING);
+
+    Log::shouldHaveReceived('log')
+        ->once()
+        ->withArgs(fn ($level, $message, $context) =>
+            $context['trap_name'] === 'wordpress'
+        );
 });
