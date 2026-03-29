@@ -54,3 +54,10 @@ it('GET /wp-json/wp/v2/users records a PROBING attempt', function (): void {
     expect(AttackerDetection::count())->toBe(1);
     expect(TrapAttempt::first()->trap_name)->toBe('wordpress');
 });
+
+it('GET /wp-json/wp/v2/users has Link and X-Powered-By headers', function (): void {
+    $response = $this->get('/wp-json/wp/v2/users');
+
+    $response->assertHeader('Link');
+    $response->assertHeader('X-Powered-By');
+});
