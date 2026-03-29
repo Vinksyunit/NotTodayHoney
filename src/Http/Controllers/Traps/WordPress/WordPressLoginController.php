@@ -22,7 +22,7 @@ class WordPressLoginController
 
     public function __invoke(Request $request): SymfonyResponse
     {
-        return $this->applyFingerprint($this->executeTrap($request));
+        return $this->applyFingerprint($request, $this->executeTrap($request));
     }
 
     protected function respondLoginPage(Request $request): Response

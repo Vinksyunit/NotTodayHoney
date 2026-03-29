@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Vinksyunit\NotTodayHoney\Http\Controllers\Traps\Concerns;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 trait HasHttpFingerprint
 {
-    protected function applyFingerprint(SymfonyResponse $response): SymfonyResponse
+    /** Apply HTTP fingerprinting headers/cookies to the given response based on trap type. */
+    protected function applyFingerprint(Request $request, SymfonyResponse $response): SymfonyResponse
     {
         $trapName = $this->getTrapName();
         $enabled = config("not-today-honey.traps.{$trapName}.specific.fingerprint.enabled", false);
@@ -20,15 +22,15 @@ trait HasHttpFingerprint
         }
 
         return match ($trapName) {
-            'wordpress' => $this->applyWordPressFingerprint($response),
+            'wordpress' => $this->applyWordPressFingerprint($request, $response),
             'phpmyadmin' => $this->applyPhpMyAdminFingerprint($response),
             default => $response,
         };
     }
 
-    private function applyWordPressFingerprint(SymfonyResponse $response): SymfonyResponse
+    private function applyWordPressFingerprint(Request $request, SymfonyResponse $response): SymfonyResponse
     {
-        $host = request()->getSchemeAndHttpHost();
+        $host = $request->getSchemeAndHttpHost();
         $response->headers->set('Link', "<{$host}/wp-json/>; rel=\"https://api.w.org/\"");
 
         $phpVersion = config('not-today-honey.traps.wordpress.specific.fingerprint.php_version', '8.1.0');
