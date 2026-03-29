@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public string $connection;
-
     public function __construct()
     {
         $this->connection = config('not-today-honey.storage.connection');
