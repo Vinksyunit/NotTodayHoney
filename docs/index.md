@@ -36,3 +36,14 @@ features:
     title: Middleware Protection
     details: Apply honeypot.block middleware globally or per route group to deny blocked IPs access instantly.
 ---
+
+## Sponsors
+
+### Special Sponsors
+
+<p align="center">
+  <a href="https://starkado.com/" target="_blank" rel="noopener">
+    <img src="https://starkado.com/images/landing/logo-starkado.svg" alt="Starkado" width="200">
+  </a>
+</p>
+

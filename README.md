@@ -38,6 +38,16 @@ php artisan migrate
 
 → [Full documentation](https://vinksyunit.github.io/NotTodayHoney)
 
+## Sponsors
+
+### Special Sponsors
+
+<p align="center">
+  <a href="https://starkado.com/" target="_blank" rel="noopener">
+    <img src="https://starkado.com/images/landing/logo-starkado.svg" alt="Starkado" width="200">
+  </a>
+</p>
+
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
