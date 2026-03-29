@@ -12,6 +12,15 @@ it('GET /admin/login records a PROBING attempt', function () {
     expect(AttackerDetection::first()->alert_level->value)->toBe('probing');
 });
 
+it('GET /admin/login returns generic admin login form', function () {
+    $response = $this->get('/admin/login');
+
+    $response->assertStatus(200);
+    $response->assertSee('Control Panel', false);
+    $response->assertSee('name="username"', false);
+    $response->assertSee('name="password"', false);
+});
+
 it('POST /admin/login returns a generic admin error page', function () {
     $response = $this->post('/admin/login', [
         'username' => 'admin',

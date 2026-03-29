@@ -15,8 +15,14 @@ it('GET wp-login.php records a PROBING attempt', function () {
     expect(TrapAttempt::first()->trap_name)->toBe('wordpress');
 });
 
-it('GET wp-login.php returns 403 when behavior is FORBIDDEN', function () {
-    $this->get('/wp-login.php')->assertStatus(403);
+it('GET wp-login.php returns WordPress login form', function () {
+    $response = $this->get('/wp-login.php');
+
+    $response->assertStatus(200);
+    $response->assertSee('WordPress', false);
+    $response->assertSee('Log In', false);
+    $response->assertSee('name="log"', false);
+    $response->assertSee('name="pwd"', false);
 });
 
 it('POST wp-login.php records INTRUSION_ATTEMPT with wrong credentials', function () {
@@ -42,8 +48,8 @@ it('POST wp-login.php records ATTACKING when known password is used', function (
     expect(CredentialAttempt::first()->password_matched)->toBeTrue();
 });
 
-it('POST wp-login.php with known password responds with configured behavior', function () {
-    config()->set('not-today-honey.traps.wordpress.behavior', TrapBehavior::FORBIDDEN);
+it('POST wp-login.php with known password responds with configured login_success_behavior', function () {
+    config()->set('not-today-honey.traps.wordpress.login_success_behavior', TrapBehavior::FORBIDDEN);
 
     $this->post('/wp-login.php', ['log' => 'admin', 'pwd' => 'password'])
         ->assertStatus(403);

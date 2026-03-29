@@ -12,6 +12,15 @@ it('GET /phpmyadmin records a PROBING attempt', function () {
     expect(AttackerDetection::first()->alert_level->value)->toBe('probing');
 });
 
+it('GET /phpmyadmin returns phpMyAdmin login form', function () {
+    $response = $this->get('/phpmyadmin/');
+
+    $response->assertStatus(200);
+    $response->assertSee('phpMyAdmin', false);
+    $response->assertSee('name="pma_username"', false);
+    $response->assertSee('name="pma_password"', false);
+});
+
 it('POST /phpmyadmin/index.php returns phpMyAdmin-like error HTML', function () {
     $response = $this->post('/phpmyadmin/index.php', [
         'pma_username' => 'root',
