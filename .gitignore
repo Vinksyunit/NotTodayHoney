@@ -38,3 +38,5 @@ docs/node_modules
 /coverage
 /workbench
 /.worktrees
+/.superpowers
+/docs/superpowers

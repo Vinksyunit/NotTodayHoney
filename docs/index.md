@@ -3,6 +3,9 @@ layout: home
 
 hero:
   name: "NotTodayHoney"
+  image:
+    src: /logo.svg
+    alt: NotTodayHoney
   text: "Stop attackers before they start"
   tagline: "Laravel honeypot traps with 3-level detection, automatic IP blocking, and event-driven alerts"
   actions:
