@@ -7,6 +7,7 @@ namespace Vinksyunit\NotTodayHoney;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Vinksyunit\NotTodayHoney\Commands\NotTodayHoneyCommand;
+use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
 
 class NotTodayHoneyServiceProvider extends PackageServiceProvider
 {
@@ -29,6 +30,11 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        $this->app['router']->aliasMiddleware(
+            'honeypot.block',
+            HoneypotBlockMiddleware::class
+        );
+
         $this->loadRoutesFrom(__DIR__.'/../routes/traps.php');
     }
 
