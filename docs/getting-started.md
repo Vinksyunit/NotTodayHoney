@@ -35,7 +35,7 @@ This creates three tables:
 
 ## Add the Middleware
 
-Add `honeypot.block` globally in `bootstrap/app.php` to deny blocked IPs from your entire application:
+Add `nottodayhoney.block` globally in `bootstrap/app.php` to deny blocked IPs from your entire application:
 
 ```php
 ->withMiddleware(function (Middleware $middleware) {

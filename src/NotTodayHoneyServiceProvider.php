@@ -11,7 +11,6 @@ use Vinksyunit\NotTodayHoney\Commands\HoneyHashPasswordCommand;
 use Vinksyunit\NotTodayHoney\Commands\HoneyStatusCommand;
 use Vinksyunit\NotTodayHoney\Commands\HoneyUnblockCommand;
 use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
-use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotRateLimitMiddleware;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
 class NotTodayHoneyServiceProvider extends PackageServiceProvider
@@ -41,13 +40,8 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         $this->app['router']->aliasMiddleware(
-            'honeypot.block',
+            'nottodayhoney.block',
             HoneypotBlockMiddleware::class
-        );
-
-        $this->app['router']->aliasMiddleware(
-            'honeypot.rate_limit',
-            HoneypotRateLimitMiddleware::class
         );
 
         $this->loadRoutesFrom(__DIR__.'/../routes/traps.php');

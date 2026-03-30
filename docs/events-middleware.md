@@ -49,7 +49,7 @@ Event::listen(AttackerAttackingEvent::class, function (AttackerAttackingEvent $e
 
 ## Middleware
 
-The `honeypot.block` middleware checks if the requesting IP is currently blocked. If it is, the request receives a 403 response. Whitelisted IPs always pass through.
+The `nottodayhoney.block` middleware checks if the requesting IP is currently blocked. If it is, the request receives a 403 response. Whitelisted IPs always pass through.
 
 ### Global Protection
 
@@ -66,7 +66,7 @@ Apply to every request in `bootstrap/app.php`:
 Apply to specific routes only:
 
 ```php
-Route::middleware('honeypot.block')->group(function () {
+Route::middleware('nottodayhoney.block')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post('/api/login', [AuthController::class, 'login']);
 });

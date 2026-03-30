@@ -21,7 +21,7 @@ A Laravel honeypot package that simulates realistic admin pages (WordPress, phpM
 - Leaked credential detection via bcrypt hash comparison against known password lists
 - Automatic IP blocking with configurable durations per alert level
 - Event-driven architecture — wire up Slack, mail, or log notifications via listeners
-- `honeypot.block` middleware to protect any route from blocked IPs
+- `nottodayhoney.block` middleware to protect any route from blocked IPs
 
 ## Requirements
 

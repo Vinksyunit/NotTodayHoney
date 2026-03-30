@@ -34,7 +34,7 @@ features:
     details: Laravel events dispatched at each alert level. Wire up Slack, mail, or any notification channel via listeners.
   - icon: 🔒
     title: Middleware Protection
-    details: Apply honeypot.block middleware globally or per route group to deny blocked IPs access instantly.
+    details: Apply nottodayhoney.block middleware globally or per route group to deny blocked IPs access instantly.
 ---
 
 ## Sponsors
