@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Enums\TrapBehavior;
 use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
@@ -192,7 +191,6 @@ trait HandlesTrapBehavior
         return match ($behavior) {
             TrapBehavior::FORBIDDEN => $this->respondForbidden(),
             TrapBehavior::ERROR => $this->respondError(),
-            TrapBehavior::INFINITE_LOADING => $this->respondInfiniteLoading(),
             TrapBehavior::FAKE_SUCCESS => $this->respondFakeSuccess($request),
         };
     }
@@ -211,28 +209,6 @@ trait HandlesTrapBehavior
     protected function respondError(): Response
     {
         return response('Internal Server Error', 500);
-    }
-
-    /**
-     * Return infinite loading response (tarpitting).
-     */
-    protected function respondInfiniteLoading(): StreamedResponse
-    {
-        return response()->stream(function (): void {
-            while (true) {
-                echo ' ';
-                if (ob_get_level() > 0) {
-                    ob_flush();
-                }
-
-                flush();
-                sleep(5);
-
-                if (connection_aborted() !== 0) {
-                    break;
-                }
-            }
-        }, 200, ['Content-Type' => 'text/html']);
     }
 
     /**

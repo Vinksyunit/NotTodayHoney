@@ -87,7 +87,6 @@ return [
     | Available behaviors after a fake successful login:
     | '403'             -> Access forbidden.
     | '500'             -> Simulates a server error.
-    | 'infinite_loading'-> Stalls the request until timeout.
     | 'fake_success'    -> Simulates an empty dashboard (default behavior).
     |
     */
