@@ -60,6 +60,16 @@ it('returns 429 and dispatches TrapCampaignDetectedEvent when global limit excee
     });
 });
 
+it('does not rate limit whitelisted IPs', function (): void {
+    config()->set('not-today-honey.whitelist', ['1.2.3.4']);
+    config()->set('not-today-honey.rate_limiting.per_ip.enabled', true);
+    config()->set('not-today-honey.rate_limiting.per_ip.max_hits', 1);
+    config()->set('not-today-honey.rate_limiting.per_ip.decay_minutes', 1);
+
+    $this->withServerVariables(['REMOTE_ADDR' => '1.2.3.4'])->get('/wp-admin/wp-login.php')->assertStatus(200);
+    $this->withServerVariables(['REMOTE_ADDR' => '1.2.3.4'])->get('/wp-admin/wp-login.php')->assertStatus(200);
+});
+
 it('applies rate limiting to phpmyadmin routes', function (): void {
     config()->set('not-today-honey.rate_limiting.per_ip.enabled', true);
     config()->set('not-today-honey.rate_limiting.per_ip.max_hits', 1);

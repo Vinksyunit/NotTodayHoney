@@ -58,7 +58,7 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
         $this->app->singleton(AttackerDetectionService::class);
         $this->app->bind(
             NotTodayHoney::class,
-            fn ($app): \Vinksyunit\NotTodayHoney\NotTodayHoney => new NotTodayHoney(
+            fn ($app): NotTodayHoney => new NotTodayHoney(
                 $app->make(AttackerDetectionService::class)
             )
         );

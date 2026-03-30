@@ -15,6 +15,11 @@ class HoneypotRateLimitMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
+        $whitelist = config('not-today-honey.whitelist', []);
+        if (in_array($request->ip(), $whitelist, true)) {
+            return $next($request);
+        }
+
         $perIp = config('not-today-honey.rate_limiting.per_ip');
 
         if ($perIp['enabled']) {
