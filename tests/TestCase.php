@@ -31,6 +31,7 @@ class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
+        config()->set('cache.default', 'array');
         config()->set('not-today-honey.whitelist', []);
         config()->set('not-today-honey.traps.wordpress.enabled', true);
         config()->set('not-today-honey.traps.phpmyadmin.enabled', true);
