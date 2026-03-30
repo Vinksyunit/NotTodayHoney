@@ -6,7 +6,6 @@ namespace Vinksyunit\NotTodayHoney\Http\Controllers\Traps\Concerns;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
@@ -92,19 +91,31 @@ trait HandlesTrapBehavior
     {
         /** @var array<string> $knownUsernames */
         $knownUsernames = config('not-today-honey.credentials.usernames', []);
-        /** @var array<array{id: string, hash: string}> $knownPasswords */
-        $knownPasswords = config('not-today-honey.credentials.passwords', []);
 
         $usernameMatched = in_array($username, $knownUsernames, true);
         $passwordMatched = false;
         $credentialId = null;
 
-        foreach ($knownPasswords as $credential) {
-            if (Hash::check($password, $credential['hash'])) {
-                $passwordMatched = true;
-                $credentialId = $credential['id'];
-                break;
-            }
+        $salt = config('not-today-honey.credentials.passwords.salt', 'not-today-honey');
+        $shortHash = substr(hash('sha256', $salt.$password), 0, 8);
+
+        /** @var array<string> $customHashes */
+        $customHashes = config('not-today-honey.credentials.passwords.custom', []);
+        $includeDefaults = (bool) config('not-today-honey.credentials.passwords.include_defaults', true);
+
+        $allHashes = $customHashes;
+
+        if ($includeDefaults) {
+            $defaultHashes = [
+                substr(hash('sha256', $salt.'letmein'), 0, 8),
+                substr(hash('sha256', $salt.'iloveyou'), 0, 8),
+            ];
+            $allHashes = array_merge($defaultHashes, $allHashes);
+        }
+
+        if (in_array($shortHash, $allHashes, true)) {
+            $passwordMatched = true;
+            $credentialId = $shortHash;
         }
 
         return [

@@ -44,6 +44,15 @@ class TestCase extends Orchestra
         config()->set('not-today-honey.traps.wordpress.specific.fingerprint.plugins', ['really-simple-ssl' => '9.1.1']);
         config()->set('not-today-honey.traps.phpmyadmin.specific.fingerprint.enabled', true);
         config()->set('not-today-honey.traps.phpmyadmin.specific.fingerprint.lang', 'en');
+        config()->set('not-today-honey.timing.min_response_ms', 0);
+        config()->set('not-today-honey.rate_limiting.per_ip.enabled', false);
+        config()->set('not-today-honey.rate_limiting.global.enabled', false);
+        config()->set('not-today-honey.credentials.passwords.salt', 'not-today-honey');
+        config()->set('not-today-honey.credentials.passwords.include_defaults', false);
+        config()->set('not-today-honey.credentials.passwords.custom', [
+            substr(hash('sha256', 'not-today-honey'.'password'), 0, 8),
+            substr(hash('sha256', 'not-today-honey'.'123456'), 0, 8),
+        ]);
     }
 
     protected function defineDatabaseMigrations(): void
