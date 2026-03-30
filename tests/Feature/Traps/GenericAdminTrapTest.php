@@ -56,7 +56,7 @@ it('POST /admin/login records credential attempt', function (): void {
 it('POST /admin/login with known password returns fake dashboard on fake_success behavior', function (): void {
     config()->set('not-today-honey.traps.generic_admin.login_success_behavior', TrapBehavior::FAKE_SUCCESS);
 
-    $response = $this->post('/admin/login', ['username' => 'admin', 'password' => 'password']);
+    $response = $this->post('/admin/login', ['username' => 'admin', 'password' => 'letmein']);
 
     $response->assertStatus(200);
     $response->assertSee('Dashboard', false);
@@ -67,6 +67,6 @@ it('POST /admin/login with known password returns fake dashboard on fake_success
 it('POST /admin/login with known password responds with configured login_success_behavior', function (): void {
     config()->set('not-today-honey.traps.generic_admin.login_success_behavior', TrapBehavior::FORBIDDEN);
 
-    $this->post('/admin/login', ['username' => 'admin', 'password' => 'password'])
+    $this->post('/admin/login', ['username' => 'admin', 'password' => 'letmein'])
         ->assertStatus(403);
 });

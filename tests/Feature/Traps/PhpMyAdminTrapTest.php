@@ -56,7 +56,7 @@ it('POST /phpmyadmin/ records credential attempt', function (): void {
 it('POST /phpmyadmin/ with known password returns fake dashboard on fake_success behavior', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.login_success_behavior', TrapBehavior::FAKE_SUCCESS);
 
-    $response = $this->post('/phpmyadmin/', ['pma_username' => 'admin', 'pma_password' => 'password']);
+    $response = $this->post('/phpmyadmin/', ['pma_username' => 'admin', 'pma_password' => 'letmein']);
 
     $response->assertStatus(200);
     $response->assertSee('General settings', false);
@@ -66,6 +66,6 @@ it('POST /phpmyadmin/ with known password returns fake dashboard on fake_success
 it('POST /phpmyadmin/ with known password responds with configured login_success_behavior', function (): void {
     config()->set('not-today-honey.traps.phpmyadmin.login_success_behavior', TrapBehavior::FORBIDDEN);
 
-    $this->post('/phpmyadmin/', ['pma_username' => 'admin', 'pma_password' => 'password'])
+    $this->post('/phpmyadmin/', ['pma_username' => 'admin', 'pma_password' => 'letmein'])
         ->assertStatus(403);
 });
