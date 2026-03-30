@@ -6,6 +6,7 @@ namespace Vinksyunit\NotTodayHoney\Http\Controllers\Traps\Concerns;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Timebox;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
@@ -32,15 +33,28 @@ trait HandlesTrapBehavior
     }
 
     /**
+     * Get the minimum response time in microseconds for this trap.
+     */
+    protected function getMinResponseUs(): int
+    {
+        $perTrap = config('not-today-honey.traps.'.$this->getTrapName().'.min_response_ms');
+        $global = config('not-today-honey.timing.min_response_ms', 1000);
+
+        return ($perTrap ?? $global) * 1000;
+    }
+
+    /**
      * Execute the trap behavior and log the attempt.
      */
     protected function executeTrap(Request $request): SymfonyResponse
     {
-        $detection = $this->recordDetection($request);
+        /** @var SymfonyResponse */
+        return (new Timebox)->call(function () use ($request): SymfonyResponse {
+            $detection = $this->recordDetection($request);
+            $this->logTrapAttempt($request, $detection->id);
 
-        $this->logTrapAttempt($request, $detection->id);
-
-        return $this->respondLoginPage($request);
+            return $this->respondLoginPage($request);
+        }, microseconds: $this->getMinResponseUs());
     }
 
     /**
@@ -51,35 +65,38 @@ trait HandlesTrapBehavior
      */
     protected function executeLoginTrap(Request $request, string $usernameField, string $passwordField): SymfonyResponse
     {
-        $username = $request->input($usernameField, '');
-        $password = $request->input($passwordField, '');
+        /** @var SymfonyResponse */
+        return (new Timebox)->call(function () use ($request, $usernameField, $passwordField): SymfonyResponse {
+            $username = $request->input($usernameField, '');
+            $password = $request->input($passwordField, '');
 
-        $credentialCheck = $this->checkCredentials($username, $password);
+            $credentialCheck = $this->checkCredentials($username, $password);
 
-        $alertLevel = $credentialCheck['password_matched']
-            ? AlertLevel::ATTACKING
-            : AlertLevel::INTRUSION_ATTEMPT;
+            $alertLevel = $credentialCheck['password_matched']
+                ? AlertLevel::ATTACKING
+                : AlertLevel::INTRUSION_ATTEMPT;
 
-        $detection = app(AttackerDetectionService::class)
-            ->recordAttempt($request->ip(), $alertLevel);
+            $detection = app(AttackerDetectionService::class)
+                ->recordAttempt($request->ip(), $alertLevel);
 
-        $this->logTrapAttempt($request, $detection->id);
+            $this->logTrapAttempt($request, $detection->id);
 
-        $this->logCredentialAttempt(
-            $detection->id,
-            $username,
-            $credentialCheck['credential_id'],
-            $credentialCheck['username_matched'],
-            $credentialCheck['password_matched']
-        );
+            $this->logCredentialAttempt(
+                $detection->id,
+                $username,
+                $credentialCheck['credential_id'],
+                $credentialCheck['username_matched'],
+                $credentialCheck['password_matched']
+            );
 
-        if ($credentialCheck['password_matched']) {
-            $trapConfig = config('not-today-honey.traps.'.$this->getTrapName());
+            if ($credentialCheck['password_matched']) {
+                $trapConfig = config('not-today-honey.traps.'.$this->getTrapName());
 
-            return $this->respondWithBehavior($trapConfig['login_success_behavior'], $request);
-        }
+                return $this->respondWithBehavior($trapConfig['login_success_behavior'], $request);
+            }
 
-        return $this->respondLoginFailed($request, $username);
+            return $this->respondLoginFailed($request, $username);
+        }, microseconds: $this->getMinResponseUs());
     }
 
     /**
