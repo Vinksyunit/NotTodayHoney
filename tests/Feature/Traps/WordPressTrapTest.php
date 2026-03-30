@@ -70,7 +70,7 @@ it('POST /wp-admin/wp-login.php returns WordPress-like error page on wrong crede
 });
 
 it('POST /wp-admin/wp-login.php records ATTACKING when known password is used', function (): void {
-    $this->post('/wp-admin/wp-login.php', ['log' => 'admin', 'pwd' => 'password']);
+    $this->post('/wp-admin/wp-login.php', ['log' => 'admin', 'pwd' => 'letmein']);
 
     expect(AttackerDetection::first()->alert_level->value)->toBe('attacking');
     expect(CredentialAttempt::first()->password_matched)->toBeTrue();
@@ -79,14 +79,14 @@ it('POST /wp-admin/wp-login.php records ATTACKING when known password is used', 
 it('POST /wp-admin/wp-login.php with known password responds with configured login_success_behavior', function (): void {
     config()->set('not-today-honey.traps.wordpress.login_success_behavior', TrapBehavior::FORBIDDEN);
 
-    $this->post('/wp-admin/wp-login.php', ['log' => 'admin', 'pwd' => 'password'])
+    $this->post('/wp-admin/wp-login.php', ['log' => 'admin', 'pwd' => 'letmein'])
         ->assertStatus(403);
 });
 
 it('POST /wp-admin/wp-login.php with known password returns fake dashboard on fake_success behavior', function (): void {
     config()->set('not-today-honey.traps.wordpress.login_success_behavior', TrapBehavior::FAKE_SUCCESS);
 
-    $response = $this->post('/wp-admin/wp-login.php', ['log' => 'admin', 'pwd' => 'password']);
+    $response = $this->post('/wp-admin/wp-login.php', ['log' => 'admin', 'pwd' => 'letmein']);
 
     $response->assertStatus(200);
     $response->assertSee('Dashboard', false);

@@ -6,6 +6,8 @@ namespace Vinksyunit\NotTodayHoney;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Vinksyunit\NotTodayHoney\Commands\HoneyGenerateSaltCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyHashPasswordCommand;
 use Vinksyunit\NotTodayHoney\Commands\HoneyStatusCommand;
 use Vinksyunit\NotTodayHoney\Commands\HoneyUnblockCommand;
 use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
@@ -31,6 +33,8 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 HoneyStatusCommand::class,
                 HoneyUnblockCommand::class,
+                HoneyHashPasswordCommand::class,
+                HoneyGenerateSaltCommand::class,
             ]);
     }
 
