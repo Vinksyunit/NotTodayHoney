@@ -6,6 +6,7 @@ namespace Vinksyunit\NotTodayHoney\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
 use Vinksyunit\NotTodayHoney\Events\TrapCampaignDetectedEvent;
@@ -41,7 +42,12 @@ class HoneypotRateLimitMiddleware
             );
 
             if (! $allowed) {
-                TrapCampaignDetectedEvent::dispatch($global['max_hits'], $global['decay_minutes']);
+                $flagKey = 'honey_global:campaign_detected';
+                $decaySeconds = $global['decay_minutes'] * 60;
+
+                if (Cache::add($flagKey, true, $decaySeconds)) {
+                    TrapCampaignDetectedEvent::dispatch($global['max_hits'], $global['decay_minutes']);
+                }
 
                 return response('Too Many Requests', 429);
             }
