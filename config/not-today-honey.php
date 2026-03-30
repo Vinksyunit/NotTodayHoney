@@ -29,13 +29,13 @@ return [
     */
     'rate_limiting' => [
         'per_ip' => [
-            'enabled'       => env('NOT_TODAY_HONEY_RATE_IP_ENABLED', true),
-            'max_hits'      => env('NOT_TODAY_HONEY_RATE_IP_MAX', 30),
+            'enabled' => env('NOT_TODAY_HONEY_RATE_IP_ENABLED', true),
+            'max_hits' => env('NOT_TODAY_HONEY_RATE_IP_MAX', 30),
             'decay_minutes' => env('NOT_TODAY_HONEY_RATE_IP_DECAY', 1),
         ],
         'global' => [
-            'enabled'       => env('NOT_TODAY_HONEY_RATE_GLOBAL_ENABLED', true),
-            'max_hits'      => env('NOT_TODAY_HONEY_RATE_GLOBAL_MAX', 200),
+            'enabled' => env('NOT_TODAY_HONEY_RATE_GLOBAL_ENABLED', true),
+            'max_hits' => env('NOT_TODAY_HONEY_RATE_GLOBAL_MAX', 200),
             'decay_minutes' => env('NOT_TODAY_HONEY_RATE_GLOBAL_DECAY', 1),
         ],
     ],
@@ -81,8 +81,8 @@ return [
 
         'passwords' => [
             'include_defaults' => env('NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST') === null,
-            'custom'           => array_filter(explode(',', env('NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST', ''))),
-            'salt'             => env('NOT_TODAY_HONEY_PASSWORD_SALT', 'not-today-honey'),
+            'custom' => array_filter(explode(',', env('NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST', ''))),
+            'salt' => env('NOT_TODAY_HONEY_PASSWORD_SALT', 'not-today-honey'),
         ],
     ],
 
@@ -101,25 +101,25 @@ return [
     */
     'alerts' => [
         'probing' => [
-            'threshold'        => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
-            'time_window'      => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440),
+            'threshold' => env('NOT_TODAY_HONEY_PROBING_THRESHOLD', 3),
+            'time_window' => env('NOT_TODAY_HONEY_PROBING_TIME_WINDOW', 1440),
             'mark_as_insecure' => env('NOT_TODAY_HONEY_PROBING_BLOCK', true),
-            'duration'         => env('NOT_TODAY_HONEY_PROBING_DURATION', 20),
-            'log_level'        => env('NOT_TODAY_HONEY_PROBING_LOG_LEVEL', 'info'),
+            'duration' => env('NOT_TODAY_HONEY_PROBING_DURATION', 20),
+            'log_level' => env('NOT_TODAY_HONEY_PROBING_LOG_LEVEL', 'info'),
         ],
         'intrusion_attempt' => [
-            'threshold'        => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
-            'time_window'      => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440),
+            'threshold' => env('NOT_TODAY_HONEY_INTRUSION_THRESHOLD', 1),
+            'time_window' => env('NOT_TODAY_HONEY_INTRUSION_TIME_WINDOW', 1440),
             'mark_as_insecure' => env('NOT_TODAY_HONEY_INTRUSION_BLOCK', true),
-            'duration'         => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 1440),
-            'log_level'        => env('NOT_TODAY_HONEY_INTRUSION_LOG_LEVEL', 'warning'),
+            'duration' => env('NOT_TODAY_HONEY_INTRUSION_DURATION', 1440),
+            'log_level' => env('NOT_TODAY_HONEY_INTRUSION_LOG_LEVEL', 'warning'),
         ],
         'attacking' => [
-            'threshold'        => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
-            'time_window'      => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440),
+            'threshold' => env('NOT_TODAY_HONEY_ATTACKING_THRESHOLD', 1),
+            'time_window' => env('NOT_TODAY_HONEY_ATTACKING_TIME_WINDOW', 1440),
             'mark_as_insecure' => env('NOT_TODAY_HONEY_ATTACKING_BLOCK', true),
-            'duration'         => env('NOT_TODAY_HONEY_ATTACKING_DURATION', 43200),
-            'log_level'        => env('NOT_TODAY_HONEY_ATTACKING_LOG_LEVEL', 'critical'),
+            'duration' => env('NOT_TODAY_HONEY_ATTACKING_DURATION', 43200),
+            'log_level' => env('NOT_TODAY_HONEY_ATTACKING_LOG_LEVEL', 'critical'),
         ],
     ],
 
@@ -137,44 +137,44 @@ return [
     'traps' => [
 
         'wordpress' => [
-            'enabled'                => env('NOT_TODAY_HONEY_WP_ENABLED', true),
-            'path'                   => env('NOT_TODAY_HONEY_WP_PATH', '/wp-admin'),
+            'enabled' => env('NOT_TODAY_HONEY_WP_ENABLED', true),
+            'path' => env('NOT_TODAY_HONEY_WP_PATH', '/wp-admin'),
             'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_WP_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
-            'min_response_ms'        => env('NOT_TODAY_HONEY_WP_MIN_RESPONSE_MS'),
+            'min_response_ms' => env('NOT_TODAY_HONEY_WP_MIN_RESPONSE_MS'),
             'specific' => [
-                'version'   => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
+                'version' => env('NOT_TODAY_HONEY_WP_VERSION', '6.4.2'),
                 'site_name' => env('NOT_TODAY_HONEY_WP_SITE_NAME', 'WordPress'),
-                'logo_url'  => env('NOT_TODAY_HONEY_WP_LOGO_URL'),
+                'logo_url' => env('NOT_TODAY_HONEY_WP_LOGO_URL'),
                 'fingerprint' => [
-                    'enabled'     => env('NOT_TODAY_HONEY_WP_FINGERPRINT_ENABLED', true),
+                    'enabled' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_ENABLED', true),
                     'php_version' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_PHP_VERSION', '8.1.0'),
-                    'rest_api'    => env('NOT_TODAY_HONEY_WP_FINGERPRINT_REST_API', true),
-                    'fake_users'  => array_filter(explode(',', env('NOT_TODAY_HONEY_WP_FINGERPRINT_FAKE_USERS', 'admin'))),
-                    'plugins'     => [],
+                    'rest_api' => env('NOT_TODAY_HONEY_WP_FINGERPRINT_REST_API', true),
+                    'fake_users' => array_filter(explode(',', env('NOT_TODAY_HONEY_WP_FINGERPRINT_FAKE_USERS', 'admin'))),
+                    'plugins' => [],
                 ],
             ],
         ],
 
         'phpmyadmin' => [
-            'enabled'                => env('NOT_TODAY_HONEY_PMA_ENABLED', true),
-            'path'                   => env('NOT_TODAY_HONEY_PMA_PATH', '/phpmyadmin'),
+            'enabled' => env('NOT_TODAY_HONEY_PMA_ENABLED', true),
+            'path' => env('NOT_TODAY_HONEY_PMA_PATH', '/phpmyadmin'),
             'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_PMA_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
-            'min_response_ms'        => env('NOT_TODAY_HONEY_PMA_MIN_RESPONSE_MS'),
+            'min_response_ms' => env('NOT_TODAY_HONEY_PMA_MIN_RESPONSE_MS'),
             'specific' => [
                 'pma_version' => env('NOT_TODAY_HONEY_PMA_VERSION', '5.2.1'),
-                'server'      => env('NOT_TODAY_HONEY_PMA_SERVER', 'localhost'),
+                'server' => env('NOT_TODAY_HONEY_PMA_SERVER', 'localhost'),
                 'fingerprint' => [
                     'enabled' => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_ENABLED', true),
-                    'lang'    => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_LANG', 'en'),
+                    'lang' => env('NOT_TODAY_HONEY_PMA_FINGERPRINT_LANG', 'en'),
                 ],
             ],
         ],
 
         'generic_admin' => [
-            'enabled'                => env('NOT_TODAY_HONEY_GENERIC_ENABLED', true),
-            'path'                   => env('NOT_TODAY_HONEY_GENERIC_PATH', '/admin'),
+            'enabled' => env('NOT_TODAY_HONEY_GENERIC_ENABLED', true),
+            'path' => env('NOT_TODAY_HONEY_GENERIC_PATH', '/admin'),
             'login_success_behavior' => TrapBehavior::from(env('NOT_TODAY_HONEY_GENERIC_LOGIN_SUCCESS_BEHAVIOR', 'fake_success')),
-            'min_response_ms'        => env('NOT_TODAY_HONEY_GENERIC_MIN_RESPONSE_MS'),
+            'min_response_ms' => env('NOT_TODAY_HONEY_GENERIC_MIN_RESPONSE_MS'),
             'specific' => [
                 'title' => env('NOT_TODAY_HONEY_GENERIC_TITLE', 'Control Panel'),
             ],
@@ -196,9 +196,9 @@ return [
     'storage' => [
         'connection' => env('NOT_TODAY_HONEY_DB_CONNECTION'),
         'tables' => [
-            'attacker_detections'  => env('NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS', 'nt_honey_attacker_detections'),
-            'trap_attempts'        => env('NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS', 'nt_honey_trap_attempts'),
-            'credential_attempts'  => env('NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS', 'nt_honey_credential_attempts'),
+            'attacker_detections' => env('NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS', 'nt_honey_attacker_detections'),
+            'trap_attempts' => env('NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS', 'nt_honey_trap_attempts'),
+            'credential_attempts' => env('NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS', 'nt_honey_credential_attempts'),
         ],
     ],
 
