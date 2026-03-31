@@ -14,14 +14,20 @@
 
 A Laravel honeypot package that simulates realistic admin pages (WordPress, phpMyAdmin) to detect and block attackers.
 
-## Features
+## Detect threats, automatically
 
-- Realistic honeypot traps — fake WordPress wp-login, phpMyAdmin, and generic `/admin` pages
-- 3-level alert system: **Probing** → **Intrusion Attempt** → **Attacking**
-- Leaked credential detection via bcrypt hash comparison against known password lists
-- Automatic IP blocking with configurable durations per alert level
-- Event-driven architecture — wire up Slack, mail, or log notifications via listeners
-- `nottodayhoney.block` middleware to protect any route from blocked IPs
+- **3-level alert system** — Probing → Intrusion Attempt → Attacking, each with configurable thresholds, block durations, and log levels
+- **Leaked credential detection** — truncated SHA256 comparison against known password lists; immediate escalation to Attacking on match
+
+## Protect your real features
+
+- **Automatic IP blocking** — detected attackers are blocked for configurable durations (minutes for probing, days for intrusion, weeks for attacking)
+- **`nottodayhoney.block` middleware** — deny blocked IPs globally or per route group with a single line
+
+## Honeypot traps that fool scanners
+
+- **Realistic decoys** — fake WordPress wp-login, phpMyAdmin, and generic admin pages with HTTP fingerprinting to attract CVE scanners and credential-stuffing bots
+- **Event-driven alerts** — Laravel events at each alert level; wire up Slack, mail, or any channel via listeners
 
 ## Requirements
 
@@ -49,6 +55,18 @@ php artisan migrate
     </span>
   </a>
 </p>
+
+## Blue team best practices
+
+NotTodayHoney detects and signals — it is one layer of a defense-in-depth strategy. A honeypot without complementary layers is a smoke detector with no sprinklers.
+
+- **Understand your attack surface** — the [OWASP Top 10](https://owasp.org/www-project-top-10/) covers the most common application-layer risks; the [ASVS](https://owasp.org/www-project-application-security-verification-standard/) gives you a structured checklist
+- **Review code for security** — authentication, authorisation boundaries, and input handling deserve attention on every change, not just security-focused sprints
+- **Run penetration tests** — a pentest finds what automated scanners miss: logic flaws, misconfigurations, privilege escalation paths
+- **Monitor and respond** — route `AttackerAttackingEvent` to an alerting pipeline; define a runbook for what your team does when an attacker is detected
+- **Keep dependencies clean** — attackers scan for known CVEs before trying credentials; run `composer audit` regularly
+
+→ [Blue Team Practices](https://vinksyunit.github.io/NotTodayHoney/blue-team) in the documentation for further reading and OWASP references.
 
 ## License
 
