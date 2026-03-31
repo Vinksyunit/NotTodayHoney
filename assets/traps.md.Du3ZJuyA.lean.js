@@ -1,1 +1,0 @@
-import{_ as e,o as d,c as a,ae as o}from"./chunks/framework.B6gjLfeO.js";const _=JSON.parse('{"title":"Traps","description":"","frontmatter":{},"headers":[],"relativePath":"traps.md","filePath":"traps.md"}'),r={name:"traps.md"};function n(s,t,i,c,p,h){return d(),a("div",null,[...t[0]||(t[0]=[o("",22)])])}const u=e(r,[["render",n]]);export{_ as __pageData,u as default};
