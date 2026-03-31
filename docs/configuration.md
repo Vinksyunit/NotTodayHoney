@@ -12,32 +12,101 @@ IPs that are never blocked. They still trigger events with `is_test = true`, so 
 
 Set `NOT_TODAY_HONEY_WHITELIST=127.0.0.1,10.0.0.1` in `.env` for multiple IPs.
 
-## Credentials
+## Rate Limiting
 
-Known usernames and bcrypt password hashes. When a submitted password matches a hash in this list, the alert level is automatically escalated to **Attacking**.
+Two independent rate limits protect the traps from being overwhelmed.
+
+**Per-IP limiting** caps how many times a single IP can hit any trap within a time window. When exceeded, the request receives a `429` response — no event is dispatched and no detection record is written.
+
+**Global limiting** caps total trap hits across all IPs. When exceeded, a `429` is returned and `TrapCampaignDetectedEvent` is dispatched once (on the first breach). This is a signal that a coordinated campaign is underway.
+
+::: tip
+Whitelisted IPs bypass both rate limits.
+:::
 
 ```php
-'credentials' => [
-    'usernames' => explode(',', env('NOT_TODAY_HONEY_USERNAMES', 'admin,administrator,webmaster,root,maintenance')),
-    'passwords' => [
-        [
-            'id' => 'rockyou_top_1',
-            'hash' => env('NOT_TODAY_HONEY_HASH_1', '...'), // bcrypt of "password"
-        ],
-        [
-            'id' => 'common_bot_pass',
-            'hash' => env('NOT_TODAY_HONEY_HASH_2', '...'), // bcrypt of "123456"
-        ],
+'rate_limiting' => [
+    'per_ip' => [
+        'enabled'       => env('NOT_TODAY_HONEY_RATE_IP_ENABLED', true),
+        'max_hits'      => env('NOT_TODAY_HONEY_RATE_IP_MAX', 30),
+        'decay_minutes' => env('NOT_TODAY_HONEY_RATE_IP_DECAY', 1),
+    ],
+    'global' => [
+        'enabled'       => env('NOT_TODAY_HONEY_RATE_GLOBAL_ENABLED', true),
+        'max_hits'      => env('NOT_TODAY_HONEY_RATE_GLOBAL_MAX', 200),
+        'decay_minutes' => env('NOT_TODAY_HONEY_RATE_GLOBAL_DECAY', 1),
     ],
 ],
 ```
 
-Add your own hashes by generating them with `php artisan tinker`:
+| Key | Default | Purpose |
+|-----|---------|---------|
+| `NOT_TODAY_HONEY_RATE_IP_ENABLED` | `true` | Enable per-IP rate limiting |
+| `NOT_TODAY_HONEY_RATE_IP_MAX` | `30` | Max hits per IP per window |
+| `NOT_TODAY_HONEY_RATE_IP_DECAY` | `1` | Window size in minutes |
+| `NOT_TODAY_HONEY_RATE_GLOBAL_ENABLED` | `true` | Enable global rate limiting |
+| `NOT_TODAY_HONEY_RATE_GLOBAL_MAX` | `200` | Max total hits per window |
+| `NOT_TODAY_HONEY_RATE_GLOBAL_DECAY` | `1` | Window size in minutes |
+
+Listen to `TrapCampaignDetectedEvent` to react to global limit breaches:
+
 ```php
-bcrypt('yourpassword');
+use Vinksyunit\NotTodayHoney\Events\TrapCampaignDetectedEvent;
+
+Event::listen(TrapCampaignDetectedEvent::class, function (TrapCampaignDetectedEvent $event) {
+    // Alert your security team — this is a coordinated attack signal
+});
 ```
 
-Store hashes in `.env` — never commit them in plain text.
+## Timing Normalization
+
+Every trap response takes at least `min_response_ms` milliseconds before being sent. This prevents timing-based reconnaissance: an attacker probing many URLs cannot distinguish a honeypot from a real page by measuring how fast it responds.
+
+```php
+'timing' => [
+    'min_response_ms' => env('NOT_TODAY_HONEY_MIN_RESPONSE_MS', 1000),
+],
+```
+
+Override per trap if needed:
+
+```env
+NOT_TODAY_HONEY_WP_MIN_RESPONSE_MS=800
+NOT_TODAY_HONEY_PMA_MIN_RESPONSE_MS=1200
+NOT_TODAY_HONEY_GENERIC_MIN_RESPONSE_MS=null
+```
+
+Set a per-trap variable to `null` (or leave it unset) to fall back to the global value.
+
+## Credentials
+
+Known usernames and passwords. When an attacker submits credentials that match this list, the alert level escalates immediately to **Attacking**.
+
+### Usernames
+
+```php
+'usernames' => explode(',', env('NOT_TODAY_HONEY_USERNAMES', 'admin,administrator,webmaster,root,maintenance')),
+```
+
+### Password detection
+
+Passwords are compared using **truncated SHA256 with a salt** — not bcrypt. The submitted password is salted and hashed, and only the first 8 hex characters are compared. This prevents timing attacks (constant-time comparison on a short string) while making rainbow tables impractical.
+
+```php
+'passwords' => [
+    'include_defaults' => env('NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST') === null,
+    'custom'           => array_filter(explode(',', env('NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST', ''))),
+    'salt'             => env('NOT_TODAY_HONEY_PASSWORD_SALT', 'not-today-honey'),
+],
+```
+
+**`include_defaults`** — enables the built-in list of common passwords (e.g. `letmein`, `iloveyou`). Automatically disabled once you set `NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST`.
+
+**`custom`** — comma-separated truncated hashes generated with `honey:hash-password`.
+
+**`salt`** — generated once with `honey:generate-salt` and stored in `.env`. Changing the salt invalidates all existing custom hashes.
+
+See [Compromised Passwords guide](/guides/passwords) for the full setup walkthrough, or [Artisan Commands](/commands) for command reference.
 
 ## Alert Levels
 
@@ -100,7 +169,7 @@ See [Traps](/traps) for per-trap details and behavior options.
 
 ```env
 NOT_TODAY_HONEY_DB_CONNECTION=security
-NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS=honey_attackers
-NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS=honey_traps
-NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS=honey_credentials
+NOT_TODAY_HONEY_TABLE_ATTACKER_DETECTIONS=nt_honey_attacker_detections
+NOT_TODAY_HONEY_TABLE_TRAP_ATTEMPTS=nt_honey_trap_attempts
+NOT_TODAY_HONEY_TABLE_CREDENTIAL_ATTEMPTS=nt_honey_credential_attempts
 ```
