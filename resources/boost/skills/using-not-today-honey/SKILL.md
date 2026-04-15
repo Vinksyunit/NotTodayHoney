@@ -20,6 +20,7 @@ NotTodayHoney exposes fake admin pages to attract scanners and credential-stuffi
 <code-snippet name="Install and publish" lang="bash">
 composer require vinksyunit/not-today-honey
 php artisan vendor:publish --tag="not-today-honey-config"
+php artisan vendor:publish --tag="not-today-honey-migrations"
 php artisan migrate
 </code-snippet>
 @endverbatim
