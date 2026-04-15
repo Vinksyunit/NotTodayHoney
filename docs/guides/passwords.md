@@ -76,4 +76,23 @@ When a submitted credential pair matches:
 2. `AttackerAttackingEvent` is dispatched
 3. The IP is blocked for 30 days (default)
 
+### Identifying which password was used
+
+The `CredentialAttempt` record stores the `password_hash` — the 8-character truncated hash that matched. You can access it from the event to identify which entry in your list was triggered:
+
+```php
+use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
+
+Event::listen(AttackerAttackingEvent::class, function (AttackerAttackingEvent $event) {
+    $attempt = $event->getDetection()->credentialAttempts()->latest()->first();
+
+    Log::critical("Leaked credential used from {$event->getIp()}", [
+        'password_hash' => $attempt?->password_hash, // matches an entry in your NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST
+        'username'      => $attempt?->username_used,
+    ]);
+});
+```
+
+Cross-reference `password_hash` against your `NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST` to identify which specific password was tried. The plain-text password is never stored — only the truncated hash.
+
 See [Configuration → Credentials](/configuration#credentials) for the full config reference.

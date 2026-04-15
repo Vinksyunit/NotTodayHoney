@@ -83,7 +83,7 @@ trait HandlesTrapBehavior
             $this->logCredentialAttempt(
                 $detection->id,
                 $username,
-                $credentialCheck['credential_id'],
+                $credentialCheck['password_hash'],
                 $credentialCheck['username_matched'],
                 $credentialCheck['password_matched']
             );
@@ -101,7 +101,7 @@ trait HandlesTrapBehavior
     /**
      * Check if credentials match known leaked credentials.
      *
-     * @return array{credential_id: string|null, username_matched: bool, password_matched: bool}
+     * @return array{password_hash: string|null, username_matched: bool, password_matched: bool}
      */
     protected function checkCredentials(string $username, string $password): array
     {
@@ -135,7 +135,7 @@ trait HandlesTrapBehavior
         }
 
         return [
-            'credential_id' => $credentialId,
+            'password_hash' => $credentialId,
             'username_matched' => $usernameMatched,
             'password_matched' => $passwordMatched,
         ];
@@ -157,7 +157,7 @@ trait HandlesTrapBehavior
 
         CredentialAttempt::create([
             'attacker_detection_id' => $detectionId,
-            'credential_id' => $credentialId,
+            'password_hash' => $credentialId,
             'username_used' => $username,
             'username_matched' => $usernameMatched,
             'password_matched' => $passwordMatched,

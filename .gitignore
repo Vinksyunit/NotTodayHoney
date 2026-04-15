@@ -33,10 +33,5 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 docs/node_modules
 
-# Superpowers brainstorming sessions
-.superpowers/
 /coverage
 /workbench
-/.worktrees
-/.superpowers
-/docs/superpowers
