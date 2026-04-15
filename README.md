@@ -39,6 +39,7 @@ A Laravel honeypot package that simulates realistic admin pages (WordPress, phpM
 ```bash
 composer require vinksyunit/not-today-honey
 php artisan vendor:publish --tag="not-today-honey-config"
+php artisan vendor:publish --tag="not-today-honey-migrations"
 php artisan migrate
 ```
 

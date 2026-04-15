@@ -11,13 +11,14 @@
 composer require vinksyunit/not-today-honey
 ```
 
-## Publish Configuration
+## Publish Configuration and Migrations
 
 ```bash
 php artisan vendor:publish --tag="not-today-honey-config"
+php artisan vendor:publish --tag="not-today-honey-migrations"
 ```
 
-This creates `config/not-today-honey.php` with all available options.
+This creates `config/not-today-honey.php` with all available options, and publishes the migration files to `database/migrations/`.
 
 ## Run Migrations
 
