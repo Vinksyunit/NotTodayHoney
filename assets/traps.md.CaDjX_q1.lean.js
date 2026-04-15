@@ -1,0 +1,1 @@
+import{_ as t,o as d,c as a,ae as o}from"./chunks/framework.CqZUKe43.js";const _=JSON.parse('{"title":"Traps","description":"","frontmatter":{},"headers":[],"relativePath":"traps.md","filePath":"traps.md"}'),r={name:"traps.md"};function n(i,e,s,c,p,l){return d(),a("div",null,[...e[0]||(e[0]=[o("",32)])])}const g=t(r,[["render",n]]);export{_ as __pageData,g as default};
