@@ -1,9 +1,10 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/NotTodayHoney/',
   title: 'NotTodayHoney',
   description: 'Laravel honeypot package to detect and block attackers',
-  srcExclude: ['superpowers/**'],
+  srcExclude: [],
   ignoreDeadLinks: true,
   themeConfig: {
     logo: '/logo.svg',

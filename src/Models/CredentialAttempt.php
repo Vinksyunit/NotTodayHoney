@@ -30,7 +30,7 @@ class CredentialAttempt extends Model
      */
     protected $fillable = [
         'attacker_detection_id',
-        'credential_id',
+        'password_hash',
         'username_used',
         'password_matched',
         'username_matched',
