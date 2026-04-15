@@ -12,7 +12,7 @@ it('per-trap min_response_ms overrides global when set', function (): void {
 
 it('uses global min_response_ms when per-trap override is null', function (): void {
     config()->set('not-today-honey.timing.min_response_ms', 0);
-    config()->set('not-today-honey.traps.wordpress.min_response_ms', null);
+    config()->set('not-today-honey.traps.wordpress.min_response_ms');
 
     $this->get('/wp-admin/wp-login.php')->assertStatus(200);
 });

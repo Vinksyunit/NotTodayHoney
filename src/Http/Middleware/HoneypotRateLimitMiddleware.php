@@ -27,7 +27,7 @@ class HoneypotRateLimitMiddleware
             $allowed = RateLimiter::attempt(
                 $key,
                 $perIp['max_hits'],
-                fn () => true,
+                fn (): true => true,
                 $perIp['decay_minutes'] * 60
             );
 
@@ -42,7 +42,7 @@ class HoneypotRateLimitMiddleware
             $allowed = RateLimiter::attempt(
                 'honey_global',
                 $global['max_hits'],
-                fn () => true,
+                fn (): true => true,
                 $global['decay_minutes'] * 60
             );
 
