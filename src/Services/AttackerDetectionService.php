@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Vinksyunit\NotTodayHoney\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
 use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
@@ -21,6 +23,16 @@ class AttackerDetectionService
      */
     public function recordAttempt(string $ip, AlertLevel $level): AttackerDetection
     {
+        $whitelist = config('not-today-honey.whitelist', []);
+        if (in_array($ip, $whitelist, true)) {
+            return new AttackerDetection([
+                'ip' => $ip,
+                'ip_hash' => $this->hashIp($ip),
+                'alert_level' => $level,
+                'attempt_count' => 0,
+            ]);
+        }
+
         $ipHash = $this->hashIp($ip);
         $config = config('not-today-honey.alerts');
         $timeWindow = $config[$level->value]['time_window'] ?? 1440;
@@ -28,7 +40,7 @@ class AttackerDetectionService
         // Try to find an existing detection for this IP, level, and within time window
         $detection = AttackerDetection::forIpAndLevel($ipHash, $level, $timeWindow);
 
-        if ($detection) {
+        if ($detection instanceof AttackerDetection) {
             // Found existing detection within time window - increment counter
             $detection->increment('attempt_count');
             $detection->refresh();
@@ -76,6 +88,18 @@ class AttackerDetectionService
             $detection->blockUntil(now()->addYears(100), $level);
         }
 
+        // Log the detection to the application's default log channel
+        $logLevel = config(sprintf('not-today-honey.alerts.%s.log_level', $level->value), 'warning');
+        $trapName = $detection->trapAttempts()->latest()->value('trap_name');
+
+        Log::log($logLevel, '[NotTodayHoney] Attacker detected', [
+            'ip' => $detection->ip,
+            'alert_level' => $level->value,
+            'attempt_count' => $detection->attempt_count,
+            'blocked_until' => $detection->blocked_until?->toIso8601String(),
+            'trap_name' => $trapName,
+        ]);
+
         // Dispatch the appropriate event
         $eventClass = match ($level) {
             AlertLevel::PROBING => AttackerProbingEvent::class,
@@ -121,7 +145,7 @@ class AttackerDetectionService
     /**
      * Get all currently blocked IPs.
      */
-    public function getBlockedIps(): \Illuminate\Database\Eloquent\Collection
+    public function getBlockedIps(): Collection
     {
         return AttackerDetection::blocked()->get();
     }
@@ -129,7 +153,7 @@ class AttackerDetectionService
     /**
      * Get detections by alert level.
      */
-    public function getDetectionsByLevel(AlertLevel $level): \Illuminate\Database\Eloquent\Collection
+    public function getDetectionsByLevel(AlertLevel $level): Collection
     {
         return AttackerDetection::byAlertLevel($level)->get();
     }

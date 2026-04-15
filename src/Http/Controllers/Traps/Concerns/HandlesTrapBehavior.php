@@ -6,10 +6,12 @@ namespace Vinksyunit\NotTodayHoney\Http\Controllers\Traps\Concerns;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Timebox;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 use Vinksyunit\NotTodayHoney\Enums\TrapBehavior;
+use Vinksyunit\NotTodayHoney\Models\AttackerDetection;
+use Vinksyunit\NotTodayHoney\Models\CredentialAttempt;
 use Vinksyunit\NotTodayHoney\Models\TrapAttempt;
 use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
@@ -30,25 +32,166 @@ trait HandlesTrapBehavior
     }
 
     /**
+     * Get the minimum response time in microseconds for this trap.
+     */
+    protected function getMinResponseUs(): int
+    {
+        $perTrap = config('not-today-honey.traps.'.$this->getTrapName().'.min_response_ms');
+        $global = config('not-today-honey.timing.min_response_ms', 1000);
+
+        return ($perTrap ?? $global) * 1000;
+    }
+
+    /**
      * Execute the trap behavior and log the attempt.
      */
     protected function executeTrap(Request $request): SymfonyResponse
     {
-        $trapConfig = config("not-today-honey.traps.{$this->getTrapName()}");
-        $behavior = $trapConfig['behavior'];
+        /** @var SymfonyResponse */
+        return (new Timebox)->call(function () use ($request): SymfonyResponse {
+            $detection = $this->recordDetection($request);
+            $this->logTrapAttempt($request, $detection->id);
 
-        $detection = $this->recordDetection($request);
+            return $this->respondLoginPage($request);
+        }, microseconds: $this->getMinResponseUs());
+    }
 
-        $this->logTrapAttempt($request, $detection->id);
+    /**
+     * Execute the trap for login submission with credential checking.
+     *
+     * @param  string  $usernameField  The form field name for username
+     * @param  string  $passwordField  The form field name for password
+     */
+    protected function executeLoginTrap(Request $request, string $usernameField, string $passwordField): SymfonyResponse
+    {
+        /** @var SymfonyResponse */
+        return (new Timebox)->call(function () use ($request, $usernameField, $passwordField): SymfonyResponse {
+            $username = $request->input($usernameField, '');
+            $password = $request->input($passwordField, '');
 
-        return $this->respondWithBehavior($behavior, $request);
+            $credentialCheck = $this->checkCredentials($username, $password);
+
+            $alertLevel = $credentialCheck['password_matched']
+                ? AlertLevel::ATTACKING
+                : AlertLevel::INTRUSION_ATTEMPT;
+
+            $detection = app(AttackerDetectionService::class)
+                ->recordAttempt($request->ip(), $alertLevel);
+
+            $this->logTrapAttempt($request, $detection->id);
+
+            $this->logCredentialAttempt(
+                $detection->id,
+                $username,
+                $credentialCheck['password_hash'],
+                $credentialCheck['username_matched'],
+                $credentialCheck['password_matched']
+            );
+
+            if ($credentialCheck['password_matched']) {
+                $trapConfig = config('not-today-honey.traps.'.$this->getTrapName());
+
+                return $this->respondWithBehavior($trapConfig['login_success_behavior'], $request);
+            }
+
+            return $this->respondLoginFailed($request, $username);
+        }, microseconds: $this->getMinResponseUs());
+    }
+
+    /**
+     * Check if credentials match known leaked credentials.
+     *
+     * @return array{password_hash: string|null, username_matched: bool, password_matched: bool}
+     */
+    protected function checkCredentials(string $username, string $password): array
+    {
+        /** @var array<string> $knownUsernames */
+        $knownUsernames = config('not-today-honey.credentials.usernames', []);
+
+        $usernameMatched = in_array($username, $knownUsernames, true);
+        $passwordMatched = false;
+        $credentialId = null;
+
+        $salt = config('not-today-honey.credentials.passwords.salt', 'not-today-honey');
+        $shortHash = substr(hash('sha256', $salt.$password), 0, 8);
+
+        /** @var array<string> $customHashes */
+        $customHashes = config('not-today-honey.credentials.passwords.custom', []);
+        $includeDefaults = (bool) config('not-today-honey.credentials.passwords.include_defaults', true);
+
+        $allHashes = $customHashes;
+
+        if ($includeDefaults) {
+            $defaultHashes = [
+                substr(hash('sha256', $salt.'letmein'), 0, 8),
+                substr(hash('sha256', $salt.'iloveyou'), 0, 8),
+            ];
+            $allHashes = array_merge($defaultHashes, $allHashes);
+        }
+
+        if (in_array($shortHash, $allHashes, true)) {
+            $passwordMatched = true;
+            $credentialId = $shortHash;
+        }
+
+        return [
+            'password_hash' => $credentialId,
+            'username_matched' => $usernameMatched,
+            'password_matched' => $passwordMatched,
+        ];
+    }
+
+    /**
+     * Log credential attempt to database.
+     */
+    protected function logCredentialAttempt(
+        ?int $detectionId,
+        string $username,
+        ?string $credentialId,
+        bool $usernameMatched,
+        bool $passwordMatched
+    ): void {
+        if ($detectionId === null) {
+            return;
+        }
+
+        CredentialAttempt::create([
+            'attacker_detection_id' => $detectionId,
+            'password_hash' => $credentialId,
+            'username_used' => $username,
+            'username_matched' => $usernameMatched,
+            'password_matched' => $passwordMatched,
+            'created_at' => now(),
+        ]);
+    }
+
+    /**
+     * Return a realistic login failed response.
+     * Override in specific controllers for trap-specific error pages.
+     */
+    protected function respondLoginFailed(Request $request, string $username): Response
+    {
+        return response('Login failed', 401);
+    }
+
+    /**
+     * Return the realistic login page for this trap.
+     * Override in specific GET controllers.
+     */
+    protected function respondLoginPage(Request $request): Response
+    {
+        return response('', 200);
     }
 
     /**
      * Log the trap attempt to database.
      */
-    protected function logTrapAttempt(Request $request, int $detectionId): void
+    protected function logTrapAttempt(Request $request, ?int $detectionId): void
     {
+        if ($detectionId === null) {
+            return;
+        }
+
         TrapAttempt::create([
             'attacker_detection_id' => $detectionId,
             'trap_name' => $this->getTrapName(),
@@ -62,7 +205,7 @@ trait HandlesTrapBehavior
     /**
      * Record the detection via service.
      */
-    protected function recordDetection(Request $request): \Vinksyunit\NotTodayHoney\Models\AttackerDetection
+    protected function recordDetection(Request $request): AttackerDetection
     {
         return app(AttackerDetectionService::class)
             ->recordAttempt($request->ip(), $this->getAlertLevel());
@@ -76,7 +219,6 @@ trait HandlesTrapBehavior
         return match ($behavior) {
             TrapBehavior::FORBIDDEN => $this->respondForbidden(),
             TrapBehavior::ERROR => $this->respondError(),
-            TrapBehavior::INFINITE_LOADING => $this->respondInfiniteLoading(),
             TrapBehavior::FAKE_SUCCESS => $this->respondFakeSuccess($request),
         };
     }
@@ -95,27 +237,6 @@ trait HandlesTrapBehavior
     protected function respondError(): Response
     {
         return response('Internal Server Error', 500);
-    }
-
-    /**
-     * Return infinite loading response (tarpitting).
-     */
-    protected function respondInfiniteLoading(): StreamedResponse
-    {
-        return response()->stream(function (): void {
-            while (true) {
-                echo ' ';
-                if (ob_get_level() > 0) {
-                    ob_flush();
-                }
-                flush();
-                sleep(5);
-
-                if (connection_aborted()) {
-                    break;
-                }
-            }
-        }, 200, ['Content-Type' => 'text/html']);
     }
 
     /**

@@ -9,41 +9,65 @@ use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginCo
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\PhpMyAdmin\PhpMyAdminLoginSubmitController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginController;
 use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WordPressLoginSubmitController;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpPluginReadmeController;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiIndexController;
+use Vinksyunit\NotTodayHoney\Http\Controllers\Traps\WordPress\WpRestApiUsersController;
+use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotRateLimitMiddleware;
 
-/*
-|--------------------------------------------------------------------------
-| WordPress Trap Routes
-|--------------------------------------------------------------------------
-*/
-if (config('not-today-honey.traps.wordpress.enabled', false)) {
-    Route::get('wp-login.php', WordPressLoginController::class);
-    Route::post('wp-login.php', WordPressLoginSubmitController::class);
-}
+Route::middleware([HoneypotRateLimitMiddleware::class])->group(function (): void {
 
-/*
-|--------------------------------------------------------------------------
-| PhpMyAdmin Trap Routes
-|--------------------------------------------------------------------------
-*/
-if (config('not-today-honey.traps.phpmyadmin.enabled', false)) {
-    $pmaPath = ltrim(config('not-today-honey.traps.phpmyadmin.path', '/phpmyadmin'), '/');
+    /*
+    |--------------------------------------------------------------------------
+    | WordPress Trap Routes
+    |--------------------------------------------------------------------------
+    */
+    if (config('not-today-honey.traps.wordpress.enabled', false)) {
+        $wpPath = ltrim(config('not-today-honey.traps.wordpress.path', '/wp-admin'), '/');
 
-    Route::prefix($pmaPath)->group(function (): void {
-        Route::get('/', PhpMyAdminLoginController::class);
-        Route::post('index.php', PhpMyAdminLoginSubmitController::class);
-    });
-}
+        Route::get($wpPath, fn () => redirect("/{$wpPath}/wp-login.php"));
+        Route::get($wpPath.'/', fn () => redirect("/{$wpPath}/wp-login.php"));
+        Route::get($wpPath.'/wp-login.php', WordPressLoginController::class);
+        Route::post($wpPath.'/wp-login.php', WordPressLoginSubmitController::class);
 
-/*
-|--------------------------------------------------------------------------
-| Generic Admin Trap Routes
-|--------------------------------------------------------------------------
-*/
-if (config('not-today-honey.traps.generic_admin.enabled', false)) {
-    $adminPath = ltrim(config('not-today-honey.traps.generic_admin.path', '/admin'), '/');
+        $fingerprintEnabled = config('not-today-honey.traps.wordpress.specific.fingerprint.enabled', false);
 
-    Route::prefix($adminPath)->group(function (): void {
-        Route::get('login', GenericAdminLoginController::class);
-        Route::post('login', GenericAdminLoginSubmitController::class);
-    });
-}
+        if ($fingerprintEnabled && config('not-today-honey.traps.wordpress.specific.fingerprint.rest_api', false)) {
+            Route::get('wp-json/', WpRestApiIndexController::class);
+            Route::get('wp-json/wp/v2/users', WpRestApiUsersController::class);
+        }
+
+        $plugins = config('not-today-honey.traps.wordpress.specific.fingerprint.plugins', []);
+        if ($fingerprintEnabled && ! empty($plugins)) {
+            Route::get('wp-content/plugins/{plugin}/readme.txt', WpPluginReadmeController::class);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PhpMyAdmin Trap Routes
+    |--------------------------------------------------------------------------
+    */
+    if (config('not-today-honey.traps.phpmyadmin.enabled', false)) {
+        $pmaPath = ltrim(config('not-today-honey.traps.phpmyadmin.path', '/phpmyadmin'), '/');
+
+        Route::prefix($pmaPath)->group(function (): void {
+            Route::get('/', PhpMyAdminLoginController::class);
+            Route::post('/', PhpMyAdminLoginSubmitController::class);
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Generic Admin Trap Routes
+    |--------------------------------------------------------------------------
+    */
+    if (config('not-today-honey.traps.generic_admin.enabled', false)) {
+        $adminPath = ltrim(config('not-today-honey.traps.generic_admin.path', '/admin'), '/');
+
+        Route::prefix($adminPath)->group(function (): void {
+            Route::get('login', GenericAdminLoginController::class);
+            Route::post('login', GenericAdminLoginSubmitController::class);
+        });
+    }
+
+});

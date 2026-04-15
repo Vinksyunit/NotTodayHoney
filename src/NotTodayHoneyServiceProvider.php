@@ -6,7 +6,12 @@ namespace Vinksyunit\NotTodayHoney;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Vinksyunit\NotTodayHoney\Commands\NotTodayHoneyCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyGenerateSaltCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyHashPasswordCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyStatusCommand;
+use Vinksyunit\NotTodayHoney\Commands\HoneyUnblockCommand;
+use Vinksyunit\NotTodayHoney\Http\Middleware\HoneypotBlockMiddleware;
+use Vinksyunit\NotTodayHoney\Services\AttackerDetectionService;
 
 class NotTodayHoneyServiceProvider extends PackageServiceProvider
 {
@@ -21,16 +26,35 @@ class NotTodayHoneyServiceProvider extends PackageServiceProvider
             ->name('not-today-honey')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_not_today_honey_table')
             ->hasMigration('create_nt_honey_attacker_detections_table')
             ->hasMigration('create_nt_honey_trap_attempts_table')
             ->hasMigration('create_nt_honey_credential_attempts_table')
-            ->hasRoutes('traps')
-            ->hasCommand(NotTodayHoneyCommand::class);
+            ->hasCommands([
+                HoneyStatusCommand::class,
+                HoneyUnblockCommand::class,
+                HoneyHashPasswordCommand::class,
+                HoneyGenerateSaltCommand::class,
+            ]);
+    }
+
+    public function packageBooted(): void
+    {
+        $this->app['router']->aliasMiddleware(
+            'nottodayhoney.block',
+            HoneypotBlockMiddleware::class
+        );
+
+        $this->loadRoutesFrom(__DIR__.'/../routes/traps.php');
     }
 
     public function packageRegistered(): void
     {
-        $this->app->singleton(\Vinksyunit\NotTodayHoney\Services\AttackerDetectionService::class);
+        $this->app->singleton(AttackerDetectionService::class);
+        $this->app->bind(
+            NotTodayHoney::class,
+            fn ($app): NotTodayHoney => new NotTodayHoney(
+                $app->make(AttackerDetectionService::class)
+            )
+        );
     }
 }

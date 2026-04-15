@@ -13,14 +13,14 @@
     "authors": [
         {
             "name": "Vinksyunit",
-            "email": "contact@vinksyunit.com",
+            "email": "Vinksyunit+nthoney@hotmail.fr",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^8.3",
+        "php": "^8.4|^8.5",
         "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^12.0"
+        "illuminate/contracts": "^12.0|^13.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",
@@ -44,16 +44,38 @@
     "autoload-dev": {
         "psr-4": {
             "Vinksyunit\\NotTodayHoney\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "scripts": {
-        "post-autoload-dump": "@composer run prepare",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare",
+            "@composer run prepare"
+        ],
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "format": "vendor/bin/pint",
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "@php vendor/bin/pint --ansi",
+            "@php vendor/bin/phpstan analyse --verbose --ansi",
+            "@php vendor/bin/rector --ansi"
+        ],
+        "docs:install": "cd docs && npm install",
+        "docs:dev": "cd docs && npx vitepress dev",
+        "docs:build": "cd docs && npx vitepress build",
+        "docs:preview": "cd docs && npx vitepress preview"
     },
     "config": {
         "sort-packages": true,
@@ -72,6 +94,6 @@
             }
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

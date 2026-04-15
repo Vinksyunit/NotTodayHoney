@@ -6,11 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public function __construct()
+    {
+        $this->connection = config('not-today-honey.storage.connection');
+    }
+
     public function up()
     {
-        Schema::create('nt_honey_trap_attempts', function (Blueprint $table) {
+        $table = config('not-today-honey.storage.tables.trap_attempts', 'nt_honey_trap_attempts');
+        $attackerDetectionsTable = config('not-today-honey.storage.tables.attacker_detections', 'nt_honey_attacker_detections');
+
+        Schema::connection($this->connection)->create($table, function (Blueprint $table) use ($attackerDetectionsTable) {
             $table->id();
-            $table->foreignId('attacker_detection_id')->constrained('nt_honey_attacker_detections')->cascadeOnDelete();
+            $table->foreignId('attacker_detection_id')->constrained($attackerDetectionsTable)->cascadeOnDelete();
             $table->string('trap_name'); // wordpress, phpmyadmin, generic_admin
             $table->string('path'); // The exact path visited
             $table->string('method', 10)->default('GET'); // HTTP method
@@ -26,6 +34,8 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('nt_honey_trap_attempts');
+        $table = config('not-today-honey.storage.tables.trap_attempts', 'nt_honey_trap_attempts');
+
+        Schema::connection($this->connection)->dropIfExists($table);
     }
 };
