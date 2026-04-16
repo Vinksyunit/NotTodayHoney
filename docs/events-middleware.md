@@ -23,29 +23,44 @@ All three events implement `AttackerAlertEvent` and expose the same methods:
 
 ### Registering Listeners
 
+Laravel automatically discovers listener classes via [event auto-discovery](https://laravel.com/docs/events#event-discovery). Create a listener class with a type-hinted `handle` method and it will be registered automatically — no manual registration needed:
+
+```php
+namespace App\Listeners;
+
+use Illuminate\Support\Facades\Log;
+use Vinksyunit\NotTodayHoney\Contracts\AttackerAlertEvent;
+use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
+
+class LogHoneypotAlert
+{
+    public function handle(AttackerAlertEvent $event): void
+    {
+        match ($event->getAlertLevel()) {
+            AlertLevel::PROBING => Log::info("Honeypot probe from {$event->getIp()} ({$event->getAttemptCount()} visits)"),
+            AlertLevel::INTRUSION_ATTEMPT => Log::warning("Login attempt from {$event->getIp()}"),
+            AlertLevel::ATTACKING => Log::critical("Known leaked credentials used from {$event->getIp()}"),
+        };
+    }
+}
+```
+
+Alternatively, for quick prototyping you can use closures in a service provider:
+
 ```php
 use Vinksyunit\NotTodayHoney\Events\AttackerProbingEvent;
-use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
-use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 
-// In a ServiceProvider or using the #[ListensTo] attribute:
-
+// In a ServiceProvider boot() method:
 Event::listen(AttackerProbingEvent::class, function (AttackerProbingEvent $event) {
     Log::info("Honeypot probe from {$event->getIp()} ({$event->getAttemptCount()} visits)");
 });
-
-Event::listen(AttackerIntrusionAttemptEvent::class, function (AttackerIntrusionAttemptEvent $event) {
-    Log::warning("Login attempt from {$event->getIp()}");
-    // Notify your security team, create a ticket, etc.
-});
-
-Event::listen(AttackerAttackingEvent::class, function (AttackerAttackingEvent $event) {
-    Log::critical("Known leaked credentials used from {$event->getIp()}");
-    // This is a serious signal — escalate immediately
-});
 ```
+
+::: warning Do not mix both approaches
+If you register a listener class via `Event::listen()` in a service provider, it will fire **twice** — once from auto-discovery and once from your manual registration. Use one approach or the other.
+:::
 
 ## Middleware
 

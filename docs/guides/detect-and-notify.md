@@ -23,34 +23,36 @@ See [Configuration → Alert Levels](/configuration#alert-levels) for threshold 
 
 ## Wiring up notifications
 
-Each alert level dispatches a dedicated event. Register listeners in a service provider or using the `#[ListensTo]` attribute:
+Each alert level dispatches a dedicated event. Thanks to Laravel's [event auto-discovery](https://laravel.com/docs/events#event-discovery), you only need to create a listener class with a type-hinted `handle` method — no manual registration required:
 
 ```php
-use Vinksyunit\NotTodayHoney\Events\AttackerProbingEvent;
-use Vinksyunit\NotTodayHoney\Events\AttackerIntrusionAttemptEvent;
-use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
+namespace App\Listeners;
+
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Vinksyunit\NotTodayHoney\Contracts\AttackerAlertEvent;
+use Vinksyunit\NotTodayHoney\Enums\AlertLevel;
 
-Event::listen(AttackerProbingEvent::class, function (AttackerProbingEvent $event) {
-    Log::info("Honeypot probe from {$event->getIp()} ({$event->getAttemptCount()} visits)");
-});
-
-Event::listen(AttackerIntrusionAttemptEvent::class, function (AttackerIntrusionAttemptEvent $event) {
-    // Example: post to a Slack webhook
-    Http::post(config('services.slack.webhook'), [
-        'text' => "⚠️ Login attempt on honeypot from {$event->getIp()}",
-    ]);
-});
-
-Event::listen(AttackerAttackingEvent::class, function (AttackerAttackingEvent $event) {
-    Log::critical("Known leaked credentials used from {$event->getIp()}");
-    // Escalate immediately — this is a serious signal
-});
+class NotifyOnHoneypotAlert
+{
+    public function handle(AttackerAlertEvent $event): void
+    {
+        match ($event->getAlertLevel()) {
+            AlertLevel::PROBING => Log::info("Honeypot probe from {$event->getIp()} ({$event->getAttemptCount()} visits)"),
+            AlertLevel::INTRUSION_ATTEMPT => Http::post(config('services.slack.webhook'), [
+                'text' => "⚠️ Login attempt on honeypot from {$event->getIp()}",
+            ]),
+            AlertLevel::ATTACKING => Log::critical("Known leaked credentials used from {$event->getIp()}"),
+        };
+    }
+}
 ```
 
-All three events share the same interface. See [Events & Middleware](/events-middleware#events) for the full method reference.
+All three events share the same `AttackerAlertEvent` interface. See [Events & Middleware](/events-middleware#events) for the full method reference.
+
+::: tip
+You can also listen to a specific event class (e.g. `AttackerAttackingEvent`) instead of the interface if you only care about one alert level.
+:::
 
 ## Campaign detection
 

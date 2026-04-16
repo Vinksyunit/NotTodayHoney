@@ -38,7 +38,7 @@ Event::listen(AttackerAttackingEvent::class, function (AttackerAttackingEvent $e
 
 ## Queued listener
 
-Route high-severity events through a queue so HTTP response time stays decoupled from webhook latency.
+Route high-severity events through a queue so HTTP response time stays decoupled from webhook latency. Laravel's event auto-discovery registers the class automatically — no manual `Event::listen()` call needed:
 
 @verbatim
 <code-snippet name="Queued listener class" lang="php">
@@ -59,20 +59,7 @@ class NotifySecurityTeamOfAttack implements ShouldQueue
 </code-snippet>
 @endverbatim
 
-Register in a provider:
-
-@verbatim
-<code-snippet name="Register listener" lang="php">
-use Illuminate\Support\Facades\Event;
-use App\Listeners\NotifySecurityTeamOfAttack;
-use Vinksyunit\NotTodayHoney\Events\AttackerAttackingEvent;
-
-public function boot(): void
-{
-    Event::listen(AttackerAttackingEvent::class, NotifySecurityTeamOfAttack::class);
-}
-</code-snippet>
-@endverbatim
+> **Warning:** Do not also register this class via `Event::listen()` in a service provider — auto-discovery already handles it. Manual registration would cause the listener to fire twice.
 
 ## Branching on alert level
 
