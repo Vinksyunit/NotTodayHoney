@@ -15,6 +15,7 @@ The first three implement `Vinksyunit\NotTodayHoney\Contracts\AttackerAlertEvent
 - `getAttemptCount(): int`
 - `getAlertLevel(): \Vinksyunit\NotTodayHoney\Enums\AlertLevel`
 - `getDetection(): \Vinksyunit\NotTodayHoney\Models\AttackerDetection`
+- `isTest(): bool` — `true` when dispatched for a whitelisted IP (no block, no DB record)
 
 `TrapCampaignDetectedEvent` is standalone: `public readonly int $maxHits`, `public readonly int $decayMinutes`.
 

@@ -28,4 +28,10 @@ interface AttackerAlertEvent
      * Get the detection model.
      */
     public function getDetection(): AttackerDetection;
+
+    /**
+     * Whether this event was triggered by a whitelisted IP (safe for testing
+     * listener wiring without producing a real detection record or block).
+     */
+    public function isTest(): bool;
 }

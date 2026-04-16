@@ -25,6 +25,12 @@ class AttackerDetection extends Model
 {
     use HasFactory;
 
+    /**
+     * Non-persisted flag indicating this detection came from a whitelisted IP
+     * and is only used to exercise listeners (no block, no DB record).
+     */
+    public bool $isTest = false;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);

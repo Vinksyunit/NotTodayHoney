@@ -25,12 +25,23 @@ class AttackerDetectionService
     {
         $whitelist = config('not-today-honey.whitelist', []);
         if (in_array($ip, $whitelist, true)) {
-            return new AttackerDetection([
+            $detection = new AttackerDetection([
                 'ip' => $ip,
                 'ip_hash' => $this->hashIp($ip),
                 'alert_level' => $level,
                 'attempt_count' => 0,
             ]);
+            $detection->isTest = true;
+
+            $eventClass = match ($level) {
+                AlertLevel::PROBING => AttackerProbingEvent::class,
+                AlertLevel::INTRUSION_ATTEMPT => AttackerIntrusionAttemptEvent::class,
+                AlertLevel::ATTACKING => AttackerAttackingEvent::class,
+            };
+
+            Event::dispatch(new $eventClass($detection));
+
+            return $detection;
         }
 
         $ipHash = $this->hashIp($ip);

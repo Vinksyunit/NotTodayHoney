@@ -53,4 +53,12 @@ trait HasAttackerAlertMethods
     {
         return $this->detection;
     }
+
+    /**
+     * Whether this event was triggered by a whitelisted IP.
+     */
+    public function isTest(): bool
+    {
+        return $this->detection->isTest;
+    }
 }

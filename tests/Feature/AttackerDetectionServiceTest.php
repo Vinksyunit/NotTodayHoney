@@ -121,6 +121,60 @@ it('does not block whitelisted IPs', function (): void {
     expect(AttackerDetection::count())->toBe(0);
 });
 
+it('dispatches the matching event for whitelisted IPs with isTest() true', function (): void {
+    Event::fake();
+    config()->set('not-today-honey.whitelist', ['127.0.0.1']);
+
+    $this->service->recordAttempt('127.0.0.1', AlertLevel::PROBING);
+
+    Event::assertDispatched(
+        AttackerProbingEvent::class,
+        fn (AttackerProbingEvent $event): bool => $event->isTest() === true
+            && $event->getIp() === '127.0.0.1'
+    );
+});
+
+it('dispatches intrusion and attacking events for whitelisted IPs', function (): void {
+    Event::fake();
+    config()->set('not-today-honey.whitelist', ['127.0.0.1']);
+
+    $this->service->recordAttempt('127.0.0.1', AlertLevel::INTRUSION_ATTEMPT);
+    $this->service->recordAttempt('127.0.0.1', AlertLevel::ATTACKING);
+
+    Event::assertDispatched(
+        AttackerIntrusionAttemptEvent::class,
+        fn (AttackerIntrusionAttemptEvent $event): bool => $event->isTest() === true
+    );
+    Event::assertDispatched(
+        AttackerAttackingEvent::class,
+        fn (AttackerAttackingEvent $event): bool => $event->isTest() === true
+    );
+});
+
+it('returns isTest() false for real (non-whitelisted) detections', function (): void {
+    Event::fake();
+    config()->set('not-today-honey.whitelist', []);
+    config()->set('not-today-honey.alerts.probing.threshold', 1);
+
+    $this->service->recordAttempt('1.2.3.4', AlertLevel::PROBING);
+
+    Event::assertDispatched(
+        AttackerProbingEvent::class,
+        fn (AttackerProbingEvent $event): bool => $event->isTest() === false
+    );
+});
+
+it('does not log "Attacker detected" for whitelisted IPs', function (): void {
+    Log::spy();
+    config()->set('not-today-honey.whitelist', ['127.0.0.1']);
+    config()->set('not-today-honey.alerts.probing.threshold', 1);
+    config()->set('not-today-honey.alerts.probing.duration', 20);
+
+    $this->service->recordAttempt('127.0.0.1', AlertLevel::PROBING);
+
+    Log::shouldNotHaveReceived('log');
+});
+
 it('logs at info level when probing threshold is reached', function (): void {
     Log::spy();
     config()->set('not-today-honey.alerts.probing.threshold', 1);
