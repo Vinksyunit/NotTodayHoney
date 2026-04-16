@@ -4,6 +4,25 @@ All notable changes to `NotTodayHoney` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v0.1.2 - 2026-04-16
+
+### What's Changed
+
+#### Added
+
+- Whitelisted IPs now dispatch `AttackerProbingEvent` / `AttackerIntrusionAttemptEvent` / `AttackerAttackingEvent` with `isTest() === true`, without blocking or persisting a detection record (#15)
+- `AttackerAlertEvent` contract now includes `isTest(): bool`
+
+#### Fixed
+
+- The documented `isTest()` escape hatch on `AttackerAlertEvent` was never implemented — whitelisted IPs never dispatched events at all (#15)
+
+#### Documentation
+
+- Upgraded VitePress to 1.6.4 with associated dependency updates
+
+**Full Changelog**: https://github.com/Vinksyunit/NotTodayHoney/compare/v0.1.1...v0.1.2
+
 ## v0.1.1 - 2026-04-15
 
 ### Added
