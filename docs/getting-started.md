@@ -30,9 +30,9 @@ This creates three tables:
 
 | Table | Purpose |
 |-------|---------|
-| `not_today_honey_attacker_detections` | IP detection records and block status |
-| `not_today_honey_trap_attempts` | Individual trap visit records |
-| `not_today_honey_credential_attempts` | Credential submission records |
+| `nt_honey_attacker_detections` | IP detection records and block status |
+| `nt_honey_trap_attempts` | Individual trap visit records |
+| `nt_honey_credential_attempts` | Credential submission records |
 
 ## Add the Middleware
 

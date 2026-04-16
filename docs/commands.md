@@ -61,7 +61,7 @@ php artisan honey:generate-salt
 **Example output:**
 
 ```
-NOT_TODAY_HONEY_PASSWORD_SALT=a3f8c2e1d9b74056
+NOT_TODAY_HONEY_PASSWORD_SALT=a3f8c2e1d9b7405692bf1e34da5c78f0
 ```
 
 Copy the output line into your `.env` file.
@@ -82,7 +82,7 @@ php artisan honey:hash-password {password}
 
 ```bash
 php artisan honey:hash-password "s3cr3t!"
-# NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST=7f4a2b1c
+NOT_TODAY_HONEY_PASSWORD_SHORT_SHA_LIST=7f4a2b1c
 ```
 
 Add the hash to your existing list in `.env`:

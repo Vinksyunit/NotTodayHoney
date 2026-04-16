@@ -6,7 +6,7 @@ A trap is a realistic-looking login page served at a URL that legitimate users w
 
 Simulates the WordPress `wp-login.php` login page, including the spoofed version number in the HTML.
 
-**Route:** `GET /wp-login.php`, `POST /wp-login.php`
+**Route:** `GET /{path}/wp-login.php`, `POST /{path}/wp-login.php` (default: `/wp-admin/wp-login.php`)
 
 **Environment variables:**
 
@@ -34,6 +34,7 @@ Simulates the phpMyAdmin login screen.
 | `NOT_TODAY_HONEY_PMA_PATH` | `/phpmyadmin` | Mount path |
 | `NOT_TODAY_HONEY_PMA_LOGIN_SUCCESS_BEHAVIOR` | `fake_success` | Response after a login attempt |
 | `NOT_TODAY_HONEY_PMA_VERSION` | `5.2.1` | Spoofed PMA version shown in the page |
+| `NOT_TODAY_HONEY_PMA_SERVER` | `localhost` | Server name displayed in the phpMyAdmin login page |
 
 ## Generic Admin Trap
 
@@ -86,6 +87,17 @@ When enabled (`NOT_TODAY_HONEY_WP_FINGERPRINT_ENABLED=true`), the WordPress trap
 | `NOT_TODAY_HONEY_WP_FINGERPRINT_PHP_VERSION` | `8.1.0` | PHP version advertised in headers |
 | `NOT_TODAY_HONEY_WP_FINGERPRINT_REST_API` | `true` | Enable REST API endpoints |
 | `NOT_TODAY_HONEY_WP_FINGERPRINT_FAKE_USERS` | `admin` | Comma-separated list of fake usernames exposed via REST API |
+
+To configure which plugins are fingerprinted, add their slugs to the `plugins` array in `config/not-today-honey.php` under `traps.wordpress.specific.fingerprint.plugins`:
+
+```php
+'plugins' => [
+    'contact-form-7',
+    'wp-file-manager',
+],
+```
+
+The route `GET /wp-content/plugins/{plugin}/readme.txt` is only registered when this array is not empty.
 
 ### phpMyAdmin Fingerprinting
 

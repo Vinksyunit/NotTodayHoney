@@ -58,6 +58,13 @@ Event::listen(TrapCampaignDetectedEvent::class, function (TrapCampaignDetectedEv
 });
 ```
 
+The event exposes two public readonly properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `$maxHits` | `int` | Threshold that triggered the campaign detection |
+| `$decayMinutes` | `int` | Time window (minutes) in which hits were counted |
+
 ## Timing Normalization
 
 Every trap response takes at least `min_response_ms` milliseconds before being sent. This prevents timing-based reconnaissance: an attacker probing many URLs cannot distinguish a honeypot from a real page by measuring how fast it responds.
