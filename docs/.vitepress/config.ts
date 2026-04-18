@@ -7,7 +7,7 @@ export default defineConfig({
   srcExclude: [],
   ignoreDeadLinks: true,
   themeConfig: {
-    logo: '/logo.svg',
+    logo: '/logo-sticker.svg',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'GitHub', link: 'https://github.com/Vinksyunit/NotTodayHoney' },
