@@ -6,6 +6,16 @@ export default defineConfig({
   description: 'Laravel honeypot package to detect and block attackers',
   srcExclude: [],
   ignoreDeadLinks: true,
+  head: [
+    [
+      'script',
+      {
+        defer: '',
+        src: 'https://static.cloudflareinsights.com/beacon.min.js',
+        'data-cf-beacon': '{"token": "d1dd4b3c45b0445ea9cc360f961949d7"}',
+      },
+    ],
+  ],
   themeConfig: {
     logo: '/logo-sticker.svg',
     nav: [
