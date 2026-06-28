@@ -6,6 +6,9 @@ export default defineConfig({
   description: 'Laravel honeypot package to detect and block attackers',
   srcExclude: [],
   ignoreDeadLinks: true,
+  sitemap: {
+    hostname: 'https://vinksyunit.github.io/NotTodayHoney/',
+  },
   head: [
     [
       'script',
