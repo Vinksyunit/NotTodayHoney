@@ -66,8 +66,8 @@ trait HandlesTrapBehavior
     {
         /** @var SymfonyResponse */
         return (new Timebox)->call(function () use ($request, $usernameField, $passwordField): SymfonyResponse {
-            $username = $request->input($usernameField, '');
-            $password = $request->input($passwordField, '');
+            $username = $this->normalizeCredential($request->input($usernameField));
+            $password = $this->normalizeCredential($request->input($passwordField));
 
             $credentialCheck = $this->checkCredentials($username, $password);
 
@@ -96,6 +96,19 @@ trait HandlesTrapBehavior
 
             return $this->respondLoginFailed($request, $username);
         }, microseconds: $this->getMinResponseUs());
+    }
+
+    /**
+     * Normalize a raw request input into a string credential.
+     *
+     * Attackers and scanners routinely submit array-style fields (log[]=x)
+     * or JSON null values. Coerce anything that is not a plain string into a
+     * safe string so an invalid submission is treated as a failed login
+     * instead of throwing a TypeError (500).
+     */
+    protected function normalizeCredential(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
     }
 
     /**
