@@ -4,6 +4,29 @@ All notable changes to `NotTodayHoney` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v0.1.3 - 2026-06-28
+
+### What's Changed
+
+#### Fixed
+
+- Login traps no longer return **HTTP 500** when a submission contains a non-string credential — array-style fields (`log[]=x`) or JSON `null` values. Such input is now normalized to a string and treated as a failed login (never accepted) instead of throwing a `TypeError` under `declare(strict_types=1)`. Affects all three login traps (WordPress, phpMyAdmin, Generic Admin) via the shared `HandlesTrapBehavior` trait. (#27)
+
+#### Documentation
+
+- Generate sitemap for Google Search Console (#26)
+- Add Google Search Console verification file (#22)
+- Add NotTodayHoney logo stickers (#19) and Starkado sponsor logo (#18)
+- Fix misleading listener registration examples (#17)
+
+#### Chores
+
+- Add Cloudflare analytics (#23)
+- Enhance CI/CD security and dependency management (#21)
+- Bump github-actions group dependencies (#25) and `dependabot/fetch-metadata` 3.0.0 → 3.1.0 (#20)
+
+**Full Changelog**: https://github.com/Vinksyunit/NotTodayHoney/compare/v0.1.2...v0.1.3
+
 ## v0.1.2 - 2026-04-16
 
 ### What's Changed
